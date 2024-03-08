@@ -1,0 +1,15 @@
+.root {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4rem 5.5rem;
+}
+
+.root h1 {
+  font-size: 4rem;
+}
+
+.icons {
+  display: flex;
+  gap: 1.2rem;
+}
