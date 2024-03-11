@@ -6,12 +6,14 @@ interface ButtonProps {
   class?: string;
   variant?: "outlined" | "contained";
   type?: "submit" | "button";
+  onClick?: () => void;
 }
 
 const Button = ({
   children,
   variant = "outlined",
   class: myClass,
+  onClick,
   type = "button",
 }: ButtonProps) => {
   const className = variant === "outlined" ? styles.outlined : styles.contained;

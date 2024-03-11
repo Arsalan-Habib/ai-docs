@@ -18,9 +18,11 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
   modal,
+  signInModal,
 }: Readonly<{
   children: React.ReactNode;
   modal: React.ReactNode;
+  signInModal: React.ReactNode;
 }>) {
   return (
     <html lang="en">
@@ -29,15 +31,14 @@ export default function RootLayout({
           <ThemeProvider theme={theme}>
             <Header />
 
-            <NextAuthProvider>
-              <>
-                {children}
+            <>
+              <NextAuthProvider>{children}</NextAuthProvider>
+              {modal}
 
-                {modal}
+              {signInModal}
 
-                <div id="modal-root" />
-              </>
-            </NextAuthProvider>
+              <div id="modal-root" />
+            </>
           </ThemeProvider>
         </AppRouterCacheProvider>
       </body>

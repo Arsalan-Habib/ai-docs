@@ -11,13 +11,6 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-      authorization: {
-        params: {
-          prompt: "consent",
-          access_type: "offline",
-          response_type: "code",
-        },
-      },
     }),
     CredentialsProvider({
       name: "User Credentials",
@@ -60,6 +53,14 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token, user }) {
       // Send properties to the client, like an access_token from a provider.
       session.accessToken = token.accessToken as string;
+
+      if (session.user) {
+        const sessionUser = await User.findOne({ email: session.user.email });
+
+        session.user.name = `${sessionUser?.profile?.firstName} ${sessionUser?.profile?.lastName}`;
+      }
+
+      console.log("user", session);
 
       return session;
     },

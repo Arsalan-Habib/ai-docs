@@ -3,7 +3,6 @@
 import dbConnect from "@/lib/mongodb";
 import User from "@/schemas/User";
 import bcrypt from "bcryptjs";
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function createUser(prevState: any, formdata: FormData) {
@@ -50,6 +49,5 @@ export async function createUser(prevState: any, formdata: FormData) {
     throw new Error("Failed to create user");
   }
 
-  revalidatePath("/");
   redirect("/signin");
 }

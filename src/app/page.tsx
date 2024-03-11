@@ -4,8 +4,14 @@ import styles from "./page.module.css";
 import Button from "@/components/Button/Button";
 import Chip from "@/components/Chip/Chip";
 import Image from "next/image";
+import { getServerSession } from "next-auth";
+import { authOptions } from "./api/auth/[...nextauth]/route";
+import { signOut } from "next-auth/react";
+import SignInOutBtn from "@/components/SignInOutBtn/SignInOutBtn";
 
 export default async function Home() {
+  const session = await getServerSession(authOptions);
+
   return (
     <main className={styles.main}>
       <Image
@@ -15,6 +21,9 @@ export default async function Home() {
         height={450}
         className={styles.bgBubble}
       />
+      <p>Logged in as: {session?.user?.name}</p>
+      <SignInOutBtn />
+      {/* <button onClick={}>Sign out</button> */}
       <h1 className={styles.mainHeading}>
         The AI Docs Companion you always wanted.
       </h1>
@@ -30,7 +39,7 @@ export default async function Home() {
             <Visit />
           </Button>
         </Link>
-        <Link href="/signup" passHref>
+        <Link href="/signin" passHref>
           <Button variant="contained">Get Started</Button>
         </Link>
       </div>

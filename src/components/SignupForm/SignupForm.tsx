@@ -6,6 +6,7 @@ import { Box, Divider, TextField, Typography } from "@mui/material";
 import Button from "../Button/Button";
 import { createUser } from "@/actions/createUser";
 import { useFormState } from "react-dom";
+import { signIn } from "next-auth/react";
 
 const initialState = {
   message: "",
@@ -92,7 +93,9 @@ const SignupForm = () => {
         <Divider sx={{ fontSize: "1.2rem", width: "100%", mt: 2, mb: 2 }}>
           Or
         </Divider>
-        <Button class={styles.signupbtn}>Sign up with Google</Button>
+        <Button class={styles.signupbtn} onClick={() => signIn("google")}>
+          Sign up with Google
+        </Button>
       </Box>
     </div>
   );
