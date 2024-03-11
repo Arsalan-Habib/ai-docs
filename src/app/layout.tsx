@@ -3,6 +3,10 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import NextAuthProvider from "@/providers/NextAuthProvider";
 import Header from "@/components/Header/Header";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
+import { ThemeProvider } from "@mui/material/styles";
+import theme from "@/utils/theme";
+// or `v1X-appRouter` if you are using Next.js v1X
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,14 +25,21 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Header />
+        <AppRouterCacheProvider>
+          <ThemeProvider theme={theme}>
+            <Header />
 
-        {/* <NextAuthProvider>{children}</NextAuthProvider> */}
-        {children}
+            <NextAuthProvider>
+              <>
+                {children}
 
-        {modal}
+                {modal}
 
-        <div id="modal-root" />
+                <div id="modal-root" />
+              </>
+            </NextAuthProvider>
+          </ThemeProvider>
+        </AppRouterCacheProvider>
       </body>
     </html>
   );

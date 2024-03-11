@@ -36,16 +36,15 @@ body {
 .modal {
   margin: 0 auto;
   top: 5%;
-  width: 80%;
+  min-width: 50%;
+  /* width: 80%; */
+  width: max-content;
   height: auto;
   border: none;
   border-radius: 12px;
   background-color: white;
-  padding: 20px;
+  padding: 6rem;
   position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   font-size: 48px;
   font-weight: 500;
 }
