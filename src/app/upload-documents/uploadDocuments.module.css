@@ -1,0 +1,43 @@
+.root {
+  max-width: 115.624rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mainHeading {
+  margin-top: 6rem;
+  margin-bottom: 2.9rem;
+  font-size: 9.6rem;
+}
+
+.description {
+  text-align: center;
+  font-size: 2.4rem;
+}
+
+.dropzone {
+  cursor: pointer;
+  border: 3px dashed #eee;
+  margin-top: 2.3rem;
+  border-radius: 0.4rem;
+  text-align: center;
+  width: 115.624rem;
+  font-size: 2rem;
+  padding: 7rem;
+  background: linear-gradient(
+    90.17deg,
+    rgba(71, 231, 253, 0.1) 0%,
+    rgba(71, 231, 253, 0) 30.73%,
+    rgba(71, 231, 253, 0.1) 100%
+  );
+}
+
+.uploadbtn {
+  margin-top: 2.2rem;
+  height: 4rem;
+  font-size: 1.2rem;
+  border-radius: 0.4rem;
+  width: 100%;
+}
