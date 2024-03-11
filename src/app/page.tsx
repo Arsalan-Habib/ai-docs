@@ -21,9 +21,6 @@ export default async function Home() {
         height={450}
         className={styles.bgBubble}
       />
-      <p>Logged in as: {session?.user?.name}</p>
-      <SignInOutBtn />
-      {/* <button onClick={}>Sign out</button> */}
       <h1 className={styles.mainHeading}>
         The AI Docs Companion you always wanted.
       </h1>

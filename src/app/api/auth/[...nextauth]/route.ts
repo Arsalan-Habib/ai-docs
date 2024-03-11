@@ -7,6 +7,10 @@ import dbConnect from "@/lib/mongodb";
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXT_AUTH_SECRET,
+  pages: {
+    signIn: "/signin",
+    error: "/signin",
+  },
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
@@ -59,8 +63,6 @@ export const authOptions: NextAuthOptions = {
 
         session.user.name = `${sessionUser?.profile?.firstName} ${sessionUser?.profile?.lastName}`;
       }
-
-      console.log("user", session);
 
       return session;
     },
