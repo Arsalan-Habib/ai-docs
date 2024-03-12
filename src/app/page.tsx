@@ -12,6 +12,8 @@ import SignInOutBtn from "@/components/SignInOutBtn/SignInOutBtn";
 export default async function Home() {
   const session = await getServerSession(authOptions);
 
+  const href = session ? "/upload-documents" : "/signin";
+
   return (
     <main className={styles.main}>
       <Image
@@ -36,7 +38,7 @@ export default async function Home() {
             <Visit />
           </Button>
         </Link>
-        <Link href="/signin" passHref>
+        <Link href={href} passHref>
           <Button variant="contained">Get Started</Button>
         </Link>
       </div>

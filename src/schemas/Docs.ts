@@ -14,7 +14,7 @@ export const docsSchema = new mongoose.Schema<IDocs>({
   uploadedPdfs: {
     type: [String],
   },
-  embedding: [Number],
+  embedding: [[Number]],
 });
 
 export default mongoose.models.docs ||

@@ -4,7 +4,8 @@ import React from "react";
 import styles from "./SignInForm.module.css";
 import { Box, Divider, TextField } from "@mui/material";
 import Button from "../Button/Button";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 const SignInForm = () => {
   return (

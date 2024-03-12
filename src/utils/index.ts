@@ -24,8 +24,8 @@ export const initializeVectorStoreWithDocuments = async ({
 };
 
 export const loadAndSplitChunks = async ({
-  chunkSize = 1000,
-  chunkOverlap = 100,
+  chunkSize = 1536,
+  chunkOverlap = 200,
   fileUrl,
 }: {
   chunkSize?: number;
@@ -36,9 +36,9 @@ export const loadAndSplitChunks = async ({
 
   for (const file of fileUrl) {
     const loader = new WebPDFLoader(file);
-    const rawDoc = (await loader.load()) as unknown as Document;
+    const rawDoc = await loader.load();
 
-    rawDocs.push(rawDoc);
+    rawDocs = [...rawDocs, ...rawDoc];
   }
 
   const splitter = new RecursiveCharacterTextSplitter({
@@ -46,7 +46,7 @@ export const loadAndSplitChunks = async ({
     chunkSize,
   });
 
-  const splitDocs = splitter.splitDocuments(rawDocs);
+  const splitDocs = await splitter.splitDocuments(rawDocs);
 
-  return splitDocs;
+  return splitDocs.map((doc) => doc.pageContent);
 };
