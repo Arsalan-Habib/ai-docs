@@ -1,4 +1,6 @@
 .root {
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .formHead {
@@ -20,6 +22,7 @@
 }
 
 .signupbtn {
+  margin-top: 2.4rem;
   width: 60% !important;
   padding: 0.5rem 0rem;
   height: 4rem !important;

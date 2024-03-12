@@ -1,3 +1,15 @@
+.root {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
 .formHead {
   display: flex;
   flex-direction: column;
@@ -18,7 +30,7 @@
 
 .signinbtn {
   width: 60% !important;
-  padding: 0.5rem 0rem;
+  padding: 0.5rem 0rem !important;
   height: 4rem !important;
   font-size: 1.4rem !important;
 }

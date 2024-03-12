@@ -32,7 +32,7 @@ export default async function Home() {
         reading isn&apos;t just simple, it&apos;s fun!
       </p>
       <div className={styles.btnsContainer}>
-        <Link href="#">
+        <Link href="/signup">
           <Button variant="outlined">
             <span>AI Docs</span>
             <Visit />

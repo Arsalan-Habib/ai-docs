@@ -90,12 +90,6 @@ const SignupForm = () => {
         <Button variant="contained" class={styles.signupbtn} type="submit">
           Sign up
         </Button>
-        <Divider sx={{ fontSize: "1.2rem", width: "100%", mt: 2, mb: 2 }}>
-          Or
-        </Divider>
-        <Button class={styles.signupbtn} onClick={() => signIn("google")}>
-          Sign up with Google
-        </Button>
       </Box>
     </div>
   );

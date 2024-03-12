@@ -35,11 +35,11 @@ body {
 
 .modal {
   margin: 0 auto;
-  top: 5%;
-  min-width: 50%;
-  /* width: 80%; */
+  top: 45%;
+  transform: translateY(-50%);
+  width: 100%;
   width: max-content;
-  height: auto;
+  /* height: auto; */
   border: none;
   border-radius: 12px;
   background-color: white;

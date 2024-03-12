@@ -4,7 +4,7 @@ import React from "react";
 
 const Signup = () => {
   return (
-    <Modal>
+    <Modal sx={{ minWidth: "800px" }}>
       <SignupForm />
     </Modal>
   );
