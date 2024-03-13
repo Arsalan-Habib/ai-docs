@@ -8,6 +8,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]/route";
 import { signOut } from "next-auth/react";
 import SignInOutBtn from "@/components/SignInOutBtn/SignInOutBtn";
+import Header from "@/components/Header/Header";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -15,44 +16,48 @@ export default async function Home() {
   const href = session ? "/upload-documents" : "/signin";
 
   return (
-    <main className={styles.main}>
-      <Image
-        src={"/bgbubble.png"}
-        alt=""
-        width={750}
-        height={450}
-        className={styles.bgBubble}
-      />
-      <h1 className={styles.mainHeading}>
-        The AI Docs Companion you always wanted.
-      </h1>
+    <div>
+      <Header />
 
-      <p className={styles.description}>
-        Say hello to documents that respond to you! <br /> With AI Docs, your
-        reading isn&apos;t just simple, it&apos;s fun!
-      </p>
-      <div className={styles.btnsContainer}>
-        <Link href="/signup">
-          <Button variant="outlined">
-            <span>AI Docs</span>
-            <Visit />
-          </Button>
-        </Link>
-        <Link href={href} passHref>
-          <Button variant="contained">Get Started</Button>
-        </Link>
-      </div>
-      <div className={styles.formatContainer}>
-        <h3 className={styles.formatHeading}>Supported formats</h3>
-        <div className={styles.chips}>
-          <Chip label="PDF" />
-          <Chip label="TXT" />
-          <Chip label="PPT" />
-          <Chip label="EPUB" />
-          <Chip label="DOC" />
+      <main className={styles.main}>
+        <Image
+          src={"/bgbubble.png"}
+          alt=""
+          width={750}
+          height={450}
+          className={styles.bgBubble}
+        />
+        <h1 className={styles.mainHeading}>
+          The AI Docs Companion you always wanted.
+        </h1>
+
+        <p className={styles.description}>
+          Say hello to documents that respond to you! <br /> With AI Docs, your
+          reading isn&apos;t just simple, it&apos;s fun!
+        </p>
+        <div className={styles.btnsContainer}>
+          <Link href="/signup">
+            <Button variant="outlined">
+              <span>AI Docs</span>
+              <Visit />
+            </Button>
+          </Link>
+          <Link href={href} passHref>
+            <Button variant="contained">Get Started</Button>
+          </Link>
         </div>
-      </div>
-    </main>
+        <div className={styles.formatContainer}>
+          <h3 className={styles.formatHeading}>Supported formats</h3>
+          <div className={styles.chips}>
+            <Chip label="PDF" />
+            <Chip label="TXT" />
+            <Chip label="PPT" />
+            <Chip label="EPUB" />
+            <Chip label="DOC" />
+          </div>
+        </div>
+      </main>
+    </div>
   );
 }
 

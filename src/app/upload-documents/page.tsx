@@ -9,6 +9,7 @@ import { useDropzone } from "react-dropzone";
 import styles from "./uploadDocuments.module.css";
 import Button from "@/components/Button/Button";
 import { Box, Chip } from "@mui/material";
+import Header from "@/components/Header/Header";
 
 const UploadDocuments = () => {
   const [filesSrc, setFilesSrc] = useState<File[]>([]);
@@ -42,41 +43,46 @@ const UploadDocuments = () => {
   }
 
   return (
-    <Box component="form" className={styles.root} onSubmit={handleSubmit}>
-      <h1 className={styles.mainHeading}>Create New Chat</h1>
-      <p className={styles.description}>
-        Upload your documents here, and your chat will be ready. <br /> You can
-        ask or search anything mentioned in the document.
-      </p>
-      <div {...getRootProps()} className={styles.dropzone}>
-        <input {...getInputProps()} />
-        {isDragActive ? (
-          <p>Drop the files here ...</p>
-        ) : (
-          <>
-            <p>
-              Drag &apos;n&apos; drop some files here, or click to select files
-            </p>
-          </>
-        )}
-      </div>
-      <div
-        style={{
-          marginTop: "1rem",
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "1rem",
-          justifyContent: "center",
-        }}
-      >
-        {filesSrc.map((file, i) => {
-          return <Chip key={i} label={file.name} />;
-        })}
-      </div>
-      <Button class={styles.uploadbtn} type="submit">
-        Upload
-      </Button>
-    </Box>
+    <div>
+      <Header />
+
+      <Box component="form" className={styles.root} onSubmit={handleSubmit}>
+        <h1 className={styles.mainHeading}>Create New Chat</h1>
+        <p className={styles.description}>
+          Upload your documents here, and your chat will be ready. <br /> You
+          can ask or search anything mentioned in the document.
+        </p>
+        <div {...getRootProps()} className={styles.dropzone}>
+          <input {...getInputProps()} />
+          {isDragActive ? (
+            <p>Drop the files here ...</p>
+          ) : (
+            <>
+              <p>
+                Drag &apos;n&apos; drop some files here, or click to select
+                files
+              </p>
+            </>
+          )}
+        </div>
+        <div
+          style={{
+            marginTop: "1rem",
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "1rem",
+            justifyContent: "center",
+          }}
+        >
+          {filesSrc.map((file, i) => {
+            return <Chip key={i} label={file.name} />;
+          })}
+        </div>
+        <Button class={styles.uploadbtn} type="submit">
+          Upload
+        </Button>
+      </Box>
+    </div>
   );
 };
 

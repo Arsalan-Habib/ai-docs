@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-interface IDocGroup {
+export interface IDocGroup {
   userId: string;
   groupId: string;
   filenames: string[];

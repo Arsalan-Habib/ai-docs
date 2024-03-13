@@ -29,8 +29,6 @@ export default function RootLayout({
       <body className={inter.className}>
         <AppRouterCacheProvider>
           <ThemeProvider theme={theme}>
-            <Header />
-
             <>
               <NextAuthProvider>{children}</NextAuthProvider>
               {modal}
