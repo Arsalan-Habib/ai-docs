@@ -2,7 +2,8 @@ import mongoose from "mongoose";
 
 interface IDocs {
   userId: string;
-  uploadedPdfs: string[];
+  content: string;
+  filename: string;
   embedding: number[];
 }
 
@@ -11,10 +12,13 @@ export const docsSchema = new mongoose.Schema<IDocs>({
     type: String,
     required: true,
   },
-  uploadedPdfs: {
-    type: [String],
+  content: {
+    type: String,
   },
-  embedding: [[Number]],
+  filename: {
+    type: String,
+  },
+  embedding: [Number],
 });
 
 export default mongoose.models.docs ||

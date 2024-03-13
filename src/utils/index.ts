@@ -30,23 +30,17 @@ export const loadAndSplitChunks = async ({
 }: {
   chunkSize?: number;
   chunkOverlap?: number;
-  fileUrl: Blob[];
+  fileUrl: Blob;
 }) => {
-  let rawDocs: Document[] = [];
-
-  for (const file of fileUrl) {
-    const loader = new WebPDFLoader(file);
-    const rawDoc = await loader.load();
-
-    rawDocs = [...rawDocs, ...rawDoc];
-  }
+  const loader = new WebPDFLoader(fileUrl);
+  const rawDoc = await loader.load();
 
   const splitter = new RecursiveCharacterTextSplitter({
     chunkOverlap,
     chunkSize,
   });
 
-  const splitDocs = await splitter.splitDocuments(rawDocs);
+  const splitDocs = await splitter.splitDocuments(rawDoc);
 
-  return splitDocs.map((doc) => doc.pageContent);
+  return splitDocs;
 };
