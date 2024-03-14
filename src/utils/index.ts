@@ -12,7 +12,7 @@ const embeddings = new OpenAIEmbeddings({
 
 // const vectorstore = new MemoryVectorStore(embeddings);
 
-const client = new MongoClient(process.env.MONGODB_URI || "");
+export const client = new MongoClient(process.env.MONGODB_URI || "");
 const namespace = "data-bot.docs";
 
 const [dbName, collectionName] = namespace.split(".");
