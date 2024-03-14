@@ -1,45 +1,73 @@
 "use client";
-
-import { Box, Button, TextField } from "@mui/material";
-import { useState } from "react";
+import AskQuestionForm from "@/components/AskQuestionForm/AskQuestionForm";
+import { ChatMessage } from "@/types";
+import { useEffect, useRef, useState } from "react";
+import styles from "./chat.module.css";
 
 const Chat = ({ params }: { params: { id: string } }) => {
-  const [query, setQuery] = useState("");
-  const [output, setOutput] = useState("");
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const messagesContainerRef = useRef<HTMLDivElement | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const sendQuery = async () => {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      body: JSON.stringify({
-        query,
-        groupId: params.id,
-      }),
-    });
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      const response = await fetch(`/api/chat/${params.id}`);
 
-    const data = await res.json();
+      const data = await response.json();
 
-    setOutput(data.data.output);
-  };
+      setMessages(data.data);
+      setLoading(false);
+    })();
+  }, [params.id]);
+
+  useEffect(() => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop =
+        messagesContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   return (
     <div style={{ width: "100%", padding: "2rem 2rem" }}>
-      <Box sx={{ width: "100%", display: "flex" }}>
-        <TextField
-          sx={{ width: "100%" }}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Type your query"
+      <div
+        style={{
+          maxWidth: "45%",
+          display: "flex",
+          flexDirection: "column",
+          gap: "1rem",
+          height: "100%",
+        }}
+      >
+        <div>
+          <h1>Chat Name</h1>
+        </div>
+        <div
+          ref={messagesContainerRef}
+          style={{
+            overflow: "auto",
+            flexGrow: 1,
+            maxHeight: "95%",
+          }}
+        >
+          {messages.map((message, i) => {
+            return (
+              <div
+                key={i}
+                className={
+                  message.type === "ai" ? styles.aiMsg : styles.humanMsg
+                }
+              >
+                <p>{message.data.content}</p>
+              </div>
+            );
+          })}
+        </div>
+        <AskQuestionForm
+          setMessages={setMessages}
+          messages={messages}
+          id={params.id}
         />
-
-        <Button variant="contained" onClick={sendQuery}>
-          Send
-        </Button>
-      </Box>
-
-      <div style={{ maxWidth: "800px", marginTop: "1rem" }}>
-        <h1>Answer:</h1>
-
-        <p>{output}</p>
       </div>
     </div>
   );

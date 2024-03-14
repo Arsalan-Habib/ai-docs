@@ -1,0 +1,22 @@
+.inputContainer {
+  min-height: 4.7rem;
+}
+
+.input {
+  height: 100%;
+  padding-left: 1rem;
+  border: 3px solid var(--secondary-color);
+  padding-right: 0px !important;
+  border-radius: 0.9rem;
+}
+
+.sendbtn {
+  background: var(--secondary-color);
+  outline: none;
+  border: none;
+  min-width: 4.7rem;
+  height: 100%;
+  padding: 0rem 2rem;
+  cursor: pointer;
+  /* min-height: 4.7rem; */
+}
