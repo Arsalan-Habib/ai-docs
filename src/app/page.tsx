@@ -9,11 +9,19 @@ import { authOptions } from "./api/auth/[...nextauth]/route";
 import { signOut } from "next-auth/react";
 import SignInOutBtn from "@/components/SignInOutBtn/SignInOutBtn";
 import Header from "@/components/Header/Header";
+import DocGroup from "@/schemas/DocGroup";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
 
-  const href = session ? "/upload-documents" : "/signin";
+  const docsGroup =
+    session && (await DocGroup.find({ userId: session.user?.id }));
+
+  const href = session
+    ? docsGroup
+      ? "/chat"
+      : "/upload-documents"
+    : "/signin";
 
   return (
     <div>

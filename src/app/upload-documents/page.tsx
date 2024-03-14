@@ -10,9 +10,11 @@ import styles from "./uploadDocuments.module.css";
 import Button from "@/components/Button/Button";
 import { Box, Chip } from "@mui/material";
 import Header from "@/components/Header/Header";
+import { useRouter } from "next/navigation";
 
 const UploadDocuments = () => {
   const [filesSrc, setFilesSrc] = useState<File[]>([]);
+  const navigate = useRouter();
 
   const onDrop = useCallback((acceptedFiles: any[]) => {
     setFilesSrc((files) => [...files, ...acceptedFiles]);
@@ -39,7 +41,9 @@ const UploadDocuments = () => {
     // console.log(filesSrc);
     const result = await res.json();
 
-    console.log("result", result);
+    if (result.success) {
+      navigate.push("/chat");
+    }
   }
 
   return (
