@@ -53,8 +53,8 @@ const UploadDocuments = () => {
       <Box component="form" className={styles.root} onSubmit={handleSubmit}>
         <h1 className={styles.mainHeading}>Create New Chat</h1>
         <p className={styles.description}>
-          Upload your documents here, and your chat will be ready. <br /> You
-          can ask or search anything mentioned in the document.
+          Upload your documents here, and your chat will be ready. <br /> You can ask or search anything mentioned in
+          the document.
         </p>
         <div {...getRootProps()} className={styles.dropzone}>
           <input {...getInputProps()} />
@@ -62,10 +62,7 @@ const UploadDocuments = () => {
             <p>Drop the files here ...</p>
           ) : (
             <>
-              <p>
-                Drag &apos;n&apos; drop some files here, or click to select
-                files
-              </p>
+              <p>Drag &apos;n&apos; drop some files here, or click to select files</p>
             </>
           )}
         </div>

@@ -1,10 +1,7 @@
 import MessageHistory from "@/schemas/MessageHistory";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const chatmessages = await MessageHistory.findOne({ sessionId: params.id });
 

@@ -21,5 +21,4 @@ export const docsSchema = new mongoose.Schema<IDocs>({
   embedding: [Number],
 });
 
-export default mongoose.models.docs ||
-  mongoose.model<IDocs>("docs", docsSchema);
+export default mongoose.models.docs || mongoose.model<IDocs>("docs", docsSchema);

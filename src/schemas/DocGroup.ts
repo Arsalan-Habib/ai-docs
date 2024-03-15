@@ -19,5 +19,4 @@ export const docGroupSchema = new mongoose.Schema<IDocGroup>({
   },
 });
 
-export default mongoose.models.docgroup ||
-  mongoose.model<IDocGroup>("docgroup", docGroupSchema);
+export default mongoose.models.docgroup || mongoose.model<IDocGroup>("docgroup", docGroupSchema);
