@@ -6,6 +6,7 @@ import Header from "@/components/Header/Header";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "@/utils/theme";
+import { Analytics } from "@vercel/analytics/react";
 // or `v1X-appRouter` if you are using Next.js v1X
 
 const inter = Inter({ subsets: ["latin"] });
@@ -39,6 +40,7 @@ export default function RootLayout({
             </>
           </ThemeProvider>
         </AppRouterCacheProvider>
+        <Analytics />
       </body>
     </html>
   );

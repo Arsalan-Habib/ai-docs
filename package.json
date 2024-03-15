@@ -23,6 +23,7 @@
     "@langchain/openai": "^0.0.16",
     "@mui/material": "^5.15.12",
     "@mui/material-nextjs": "^5.15.11",
+    "@vercel/analytics": "^1.2.2",
     "bcryptjs": "^2.4.3",
     "langchain": "^0.1.25",
     "mongoose": "^8.2.1",
