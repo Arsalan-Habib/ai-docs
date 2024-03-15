@@ -5,13 +5,15 @@ import Button from "@/components/Button/Button";
 import Chip from "@/components/Chip/Chip";
 import Image from "next/image";
 import { getServerSession } from "next-auth";
-import { authOptions } from "./api/auth/[...nextauth]/route";
 import { signOut } from "next-auth/react";
 import SignInOutBtn from "@/components/SignInOutBtn/SignInOutBtn";
 import Header from "@/components/Header/Header";
 import DocGroup from "@/schemas/DocGroup";
+import { authOptions } from "@/utils/authOptions";
+import dbConnect from "@/lib/mongodb";
 
 export default async function Home() {
+  await dbConnect();
   const session = await getServerSession(authOptions);
 
   const docsGroup =

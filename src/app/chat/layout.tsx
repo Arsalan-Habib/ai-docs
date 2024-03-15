@@ -1,8 +1,8 @@
 import { getServerSession } from "next-auth";
 import React from "react";
-import { authOptions } from "../api/auth/[...nextauth]/route";
 import DocGroup from "@/schemas/DocGroup";
 import Sidebar from "@/components/Sidebar/Sidebar";
+import { authOptions } from "@/utils/authOptions";
 
 const ChatLayout = async ({ children }: { children: React.ReactNode }) => {
   const session = await getServerSession(authOptions);

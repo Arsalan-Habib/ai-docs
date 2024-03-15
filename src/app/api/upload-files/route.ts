@@ -1,11 +1,11 @@
 import dbConnect from "@/lib/mongodb";
 import DocGroup from "@/schemas/DocGroup";
 import { loadAndSplitChunks, vectorstore } from "@/utils";
+import { authOptions } from "@/utils/authOptions";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { randomBytes } from "crypto";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "../auth/[...nextauth]/route";
 
 const Bucket = process.env.AWS_BUCKET_NAME as string;
 const s3 = new S3Client({

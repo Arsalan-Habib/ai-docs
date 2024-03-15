@@ -9,9 +9,9 @@ import { ChatOpenAI } from "@langchain/openai";
 import { createStuffDocumentsChain } from "langchain/chains/combine_documents";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "../auth/[...nextauth]/route";
 import { RunnableWithMessageHistory } from "@langchain/core/runnables";
 import { MongoDBChatMessageHistory } from "@langchain/mongodb";
+import { authOptions } from "@/utils/authOptions";
 
 const llm = new ChatOpenAI({
   modelName: "gpt-3.5-turbo",

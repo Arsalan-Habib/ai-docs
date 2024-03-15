@@ -1,12 +1,9 @@
 "use client";
 
-import React from "react";
-import styles from "./SignInForm.module.css";
-import { Box, Divider, TextField } from "@mui/material";
+import { Box, TextField } from "@mui/material";
+import { signIn } from "next-auth/react";
 import Button from "../Button/Button";
-import { signIn, useSession } from "next-auth/react";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import Link from "next/link";
+import styles from "./SignInForm.module.css";
 
 const SignInForm = () => {
   return (

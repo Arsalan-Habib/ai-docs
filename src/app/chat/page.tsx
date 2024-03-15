@@ -1,10 +1,10 @@
 import { getServerSession } from "next-auth";
 import React from "react";
-import { authOptions } from "../api/auth/[...nextauth]/route";
 import { NextResponse } from "next/server";
 import { redirect } from "next/navigation";
+import { authOptions } from "@/utils/authOptions";
 
-const page = async (req: Request) => {
+const page = async () => {
   const session = await getServerSession(authOptions);
 
   if (!session) {
