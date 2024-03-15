@@ -21,6 +21,9 @@ const [dbName, collectionName] = namespace.split(".");
 
 const collection = client.db(dbName).collection(collectionName);
 
+
+
+
 function iteratorToStream(iterator: any) {
   return new ReadableStream({
     async pull(controller) {
@@ -87,7 +90,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
     },
   });
 
+
+  
   const result = await retriever.getRelevantDocuments(body.query);
+
+  console.log("result", result)
 
   const prompt = ChatPromptTemplate.fromMessages([
     [
@@ -97,6 +104,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
     new MessagesPlaceholder("history"),
     ["human", "{question}"],
   ]);
+
+  console.log("prompt", prompt)
+
 
   const ragChain = await createStuffDocumentsChain({
     llm,
@@ -114,6 +124,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
     inputMessagesKey: "question",
     historyMessagesKey: "history",
   });
+
+
 
   const output = await chainWithHistory.streamEvents(
     {

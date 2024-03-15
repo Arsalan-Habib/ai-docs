@@ -18,7 +18,7 @@ export default async function Home() {
 
   const docsGroup = session && (await DocGroup.find({ userId: session.user?.id }));
 
-  const href = session ? (docsGroup ? "/chat" : "/upload-documents") : "/signin";
+  const href = session ? (docsGroup && docsGroup.length > 0 ? "/chat" : "/upload-documents") : "/signin";
 
   return (
     <div>
@@ -33,26 +33,17 @@ export default async function Home() {
           it&apos;s fun!
         </p>
         <div className={styles.btnsContainer}>
-          <Link href="/signup">
+          {/* <Link href="/signup">
             <Button variant="outlined">
               <span>AI Docs</span>
               <Visit />
             </Button>
-          </Link>
+          </Link> */}
           <Link href={href} passHref>
             <Button variant="contained">Get Started</Button>
           </Link>
         </div>
-        <div className={styles.formatContainer}>
-          <h3 className={styles.formatHeading}>Supported formats</h3>
-          <div className={styles.chips}>
-            <Chip label="PDF" />
-            <Chip label="TXT" />
-            <Chip label="PPT" />
-            <Chip label="EPUB" />
-            <Chip label="DOC" />
-          </div>
-        </div>
+
       </main>
     </div>
   );

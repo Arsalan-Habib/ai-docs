@@ -1,9 +1,10 @@
 "use client";
 
-import { Box, TextField } from "@mui/material";
+import { Box, Divider, TextField, Typography } from "@mui/material";
 import { signIn } from "next-auth/react";
 import Button from "../Button/Button";
 import styles from "./SignInForm.module.css";
+import Link from "next/link";
 
 const SignInForm = () => {
   return (
@@ -55,6 +56,9 @@ const SignInForm = () => {
         <Button variant="contained" type="submit">
           Sign in
         </Button>
+        <Divider sx={{ my: 1, width: "100%" }}  />
+        <p style={{ fontSize: "1.6rem"}}>New to AI Docs? <Link href="/signup">Sign up here</Link></p>
+
       </Box>
     </div>
   );

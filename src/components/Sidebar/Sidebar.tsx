@@ -37,7 +37,7 @@ const Sidebar = ({ groups }: SidebarProps) => {
               <Link key={group.groupId} href={`/chat/${group.groupId}`}>
                 <div className={styles.groupContainer}>
                   {group.filenames.map((filename, i) => {
-                    return <p key={i}>{filename}</p>;
+                    return <p key={i} style={{ fontSize: "1.4rem"}}>{filename}</p>;
                   })}
                 </div>
               </Link>

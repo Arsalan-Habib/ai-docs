@@ -7,6 +7,7 @@ import Button from "../Button/Button";
 import { createUser } from "@/actions/createUser";
 import { useFormState } from "react-dom";
 import { signIn } from "next-auth/react";
+import Link from "next/link";
 
 const initialState = {
   message: "",
@@ -90,6 +91,7 @@ const SignupForm = () => {
         <Button variant="contained" class={styles.signupbtn} type="submit">
           Sign up
         </Button>
+
       </Box>
     </div>
   );

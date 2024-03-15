@@ -76,7 +76,7 @@ const UploadDocuments = () => {
           }}
         >
           {filesSrc.map((file, i) => {
-            return <Chip key={i} label={file.name} />;
+            return <Chip key={i} label={file.name} sx={{ fontSize: "1.4rem"}} />;
           })}
         </div>
         <Button class={styles.uploadbtn} type="submit">
