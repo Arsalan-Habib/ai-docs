@@ -4,13 +4,7 @@ import { type ElementRef, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
 
-export function Modal({
-  children,
-  sx,
-}: {
-  children: React.ReactNode;
-  sx?: any;
-}) {
+export function Modal({ children, sx }: { children: React.ReactNode; sx?: any }) {
   const router = useRouter();
   const dialogRef = useRef<ElementRef<"dialog">>(null);
   useEffect(() => {
@@ -30,6 +24,6 @@ export function Modal({
         <button onClick={onDismiss} className="close-button" />
       </dialog>
     </div>,
-    document.getElementById("modal-root")!
+    document.getElementById("modal-root")!,
   );
 }

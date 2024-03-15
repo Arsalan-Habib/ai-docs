@@ -1,10 +1,7 @@
 import dbConnect from "@/lib/mongodb";
 import { client, vectorstore } from "@/utils";
 import { StringOutputParser } from "@langchain/core/output_parsers";
-import {
-  ChatPromptTemplate,
-  MessagesPlaceholder,
-} from "@langchain/core/prompts";
+import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts";
 import { ChatOpenAI } from "@langchain/openai";
 import { createStuffDocumentsChain } from "langchain/chains/combine_documents";
 import { getServerSession } from "next-auth";
@@ -128,7 +125,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       configurable: {
         sessionId: body.groupId,
       },
-    }
+    },
   );
 
   const iterator = makeIterator(output);

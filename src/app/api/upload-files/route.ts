@@ -73,7 +73,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
       vectorstore.addDocuments(docs);
       filenames.push(filename);
-    })
+    }),
   );
 
   if (filenames.length > 0) {

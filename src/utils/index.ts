@@ -26,11 +26,7 @@ export const vectorstore = new MongoDBAtlasVectorSearch(embeddings, {
   embeddingKey: "embedding",
 });
 
-export const initializeVectorStoreWithDocuments = async ({
-  documents,
-}: {
-  documents: Document[];
-}) => {
+export const initializeVectorStoreWithDocuments = async ({ documents }: { documents: Document[] }) => {
   await vectorstore.addDocuments(documents);
 
   return vectorstore;
