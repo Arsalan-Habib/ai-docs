@@ -1,35 +1,42 @@
 "use client";
 
-import { Box, Divider, TextField, Typography } from "@mui/material";
+import { Box, CircularProgress, Divider, TextField } from "@mui/material";
 import { signIn } from "next-auth/react";
-import Button from "../Button/Button";
-import styles from "./SignInForm.module.css";
 import Link from "next/link";
+import { FormEvent, Suspense, useState } from "react";
+import Button from "../Button/Button";
+import SignInError from "./SignInError";
+import styles from "./SignInForm.module.css";
 
 const SignInForm = () => {
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const formdata = new FormData(e.currentTarget);
+
+    await signIn("credentials", {
+      redirect: true,
+      callbackUrl: "/",
+      email: formdata.get("email"),
+      password: formdata.get("password"),
+    });
+    setLoading(false);
+  };
+
   return (
     <div className={styles.root}>
+      <Suspense>
+        <SignInError />
+      </Suspense>
       <div className={styles.formHead}>
         <h1>Sign in</h1>
         <p>Please login to continue to your account.</p>
       </div>
 
-      <Box
-        className={styles.form}
-        component="form"
-        sx={{ mt: 4 }}
-        onSubmit={(e) => {
-          e.preventDefault();
-          const formdata = new FormData(e.currentTarget);
-
-          signIn("credentials", {
-            redirect: true,
-            callbackUrl: "/",
-            email: formdata.get("email"),
-            password: formdata.get("password"),
-          });
-        }}
-      >
+      <Box className={styles.form} component="form" sx={{ mt: 4 }} onSubmit={handleSubmit}>
         <TextField
           type="email"
           sx={{ width: "100%" }}
@@ -53,12 +60,14 @@ const SignInForm = () => {
           name="password"
         />
 
-        <Button variant="contained" type="submit">
-          Sign in
+        <Button variant="contained" type="submit" disabled={loading}>
+          {loading && <CircularProgress size={"1.4rem"} color="inherit" />}
+          <span>Sign in</span>
         </Button>
-        <Divider sx={{ my: 1, width: "100%" }}  />
-        <p style={{ fontSize: "1.6rem"}}>New to AI Docs? <Link href="/signup">Sign up here</Link></p>
-
+        <Divider sx={{ my: 1, width: "100%" }} />
+        <p style={{ fontSize: "1.6rem" }}>
+          New to AI Docs? <Link href="/signup">Sign up here</Link>
+        </p>
       </Box>
     </div>
   );

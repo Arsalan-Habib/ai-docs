@@ -1,10 +1,11 @@
 import dbConnect from "@/lib/mongodb";
 import DocGroup from "@/schemas/DocGroup";
-import { loadAndSplitChunks, vectorstore } from "@/utils";
+import { loadAndSplitChunks, sleep, vectorstore } from "@/utils";
 import { authOptions } from "@/utils/authOptions";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { randomBytes } from "crypto";
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 
 const Bucket = process.env.AWS_BUCKET_NAME as string;
@@ -29,24 +30,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
   const files = formData.getAll("file") as File[];
 
-  // const client = new MongoClient(process.env.MONGODB_URI || "");
-  // const namespace = "data-bot.docs";
-
-  // const [dbName, collectionName] = namespace.split(".");
-
-  // const collection = client.db(dbName).collection(collectionName);
-
-  // const vectorstore = new MongoDBAtlasVectorSearch(
-  //   new OpenAIEmbeddings({
-  //     modelName: "text-embedding-3-small",
-  //   }),
-  //   {
-  //     collection: collection as any,
-  //     indexName: "data-bot-vector-index",
-  //     textKey: "content",
-  //     embeddingKey: "embedding",
-  //   }
-  // );
+  if (files.length === 0) {
+    return NextResponse.json({ success: false, message: "No files found" });
+  }
 
   const groupId = randomBytes(8).toString("hex");
 
@@ -87,5 +73,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
   return NextResponse.json({
     success: true,
     message: "Uploaded Successfully",
+    data: {
+      groupId,
+    },
   });
 }

@@ -10,7 +10,9 @@ interface SidebarProps {
 const Sidebar = ({ groups }: SidebarProps) => {
   return (
     <div className={styles.root}>
-      <h1>AI Docs.</h1>
+      <Link href="/" style={{ textDecoration: "none", color: "black" }}>
+        <h1>AI Docs.</h1>
+      </Link>
       <div className={styles.libraryContainer}>
         <p>Library</p>
       </div>
@@ -37,7 +39,11 @@ const Sidebar = ({ groups }: SidebarProps) => {
               <Link key={group.groupId} href={`/chat/${group.groupId}`}>
                 <div className={styles.groupContainer}>
                   {group.filenames.map((filename, i) => {
-                    return <p key={i} style={{ fontSize: "1.4rem"}}>{filename}</p>;
+                    return (
+                      <p key={i} style={{ fontSize: "1.4rem" }}>
+                        {filename}
+                      </p>
+                    );
                   })}
                 </div>
               </Link>

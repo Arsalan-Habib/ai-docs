@@ -40,10 +40,9 @@ export default async function Home() {
             </Button>
           </Link> */}
           <Link href={href} passHref>
-            <Button variant="contained">Get Started</Button>
+            <Button variant="contained">{!session ? "Sign In" : "Get Started"}</Button>
           </Link>
         </div>
-
       </main>
     </div>
   );

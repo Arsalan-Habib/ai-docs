@@ -36,7 +36,7 @@ export const authOptions: NextAuthOptions = {
         if (isPasswordCorrect) {
           return Promise.resolve(user);
         } else {
-          return Promise.resolve("invalid user");
+          return Promise.reject("invalid user");
         }
       },
     }),

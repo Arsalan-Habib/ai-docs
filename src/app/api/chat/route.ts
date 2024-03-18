@@ -1,14 +1,14 @@
 import dbConnect from "@/lib/mongodb";
-import { client, vectorstore } from "@/utils";
+import { client, sleep, vectorstore } from "@/utils";
+import { authOptions } from "@/utils/authOptions";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts";
+import { RunnableWithMessageHistory } from "@langchain/core/runnables";
+import { MongoDBChatMessageHistory } from "@langchain/mongodb";
 import { ChatOpenAI } from "@langchain/openai";
 import { createStuffDocumentsChain } from "langchain/chains/combine_documents";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { RunnableWithMessageHistory } from "@langchain/core/runnables";
-import { MongoDBChatMessageHistory } from "@langchain/mongodb";
-import { authOptions } from "@/utils/authOptions";
 
 const llm = new ChatOpenAI({
   modelName: "gpt-3.5-turbo",
@@ -20,9 +20,6 @@ const namespace = "data-bot.historymessages";
 const [dbName, collectionName] = namespace.split(".");
 
 const collection = client.db(dbName).collection(collectionName);
-
-
-
 
 function iteratorToStream(iterator: any) {
   return new ReadableStream({
@@ -39,10 +36,6 @@ function iteratorToStream(iterator: any) {
 }
 
 const encoder = new TextEncoder();
-
-const sleep = async (time: number) => {
-  return new Promise((resolve) => setTimeout(resolve, time));
-};
 
 async function* makeIterator(res: any) {
   for await (const event of res) {
@@ -75,7 +68,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
   const retriever = await vectorstore.asRetriever({
     searchType: "mmr",
+    k: 10,
     searchKwargs: {
+      fetchK: 20,
       lambda: 0.1,
     },
     filter: {
@@ -90,23 +85,22 @@ export async function POST(req: NextRequest, res: NextResponse) {
     },
   });
 
-
-  
   const result = await retriever.getRelevantDocuments(body.query);
-
-  console.log("result", result)
 
   const prompt = ChatPromptTemplate.fromMessages([
     [
       "system",
-      "You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. Answer the question in as much detail as possible. If you don't know the answer, just say that you don't know.\n\n Context: {context}",
+      `You are a helpful AI assistant. Use the following pieces of context to answer the question at the end.
+      If you don't know the answer, just say you don't know. DO NOT try to make up an answer.
+      If the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context.
+      If there is no context provided to answer the question, DO NOT answer that question and politely respond that there is no context provided.
+      
+      {context}
+      `,
     ],
     new MessagesPlaceholder("history"),
     ["human", "{question}"],
   ]);
-
-  console.log("prompt", prompt)
-
 
   const ragChain = await createStuffDocumentsChain({
     llm,
@@ -124,8 +118,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
     inputMessagesKey: "question",
     historyMessagesKey: "history",
   });
-
-
 
   const output = await chainWithHistory.streamEvents(
     {

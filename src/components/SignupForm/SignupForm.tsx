@@ -1,16 +1,36 @@
 "use client";
 
-import React from "react";
-import styles from "./SignupForm.module.css";
-import { Box, Divider, TextField, Typography } from "@mui/material";
-import Button from "../Button/Button";
 import { createUser } from "@/actions/createUser";
-import { useFormState } from "react-dom";
-import { signIn } from "next-auth/react";
-import Link from "next/link";
+import { Alert, Box, CircularProgress, Snackbar, TextField, Typography } from "@mui/material";
+import { useFormState, useFormStatus } from "react-dom";
+import Button from "../Button/Button";
+import styles from "./SignupForm.module.css";
+
+const zodErrors: {
+  email?: string[];
+  password?: string[];
+  confirmPassword?: string[];
+} = {
+  email: undefined,
+  password: undefined,
+  confirmPassword: undefined,
+};
 
 const initialState = {
+  fieldErrors: zodErrors,
   message: "",
+  status: false,
+};
+
+const SignupButton = () => {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button variant="contained" class={styles.signupbtn} type="submit" disabled={pending}>
+      {pending && <CircularProgress size={"1.5rem"} color="inherit" />}
+      <span>Sign up</span>
+    </Button>
+  );
 };
 
 const SignupForm = () => {
@@ -18,6 +38,15 @@ const SignupForm = () => {
 
   return (
     <div className={styles.root}>
+      <Snackbar open={!!state.message} autoHideDuration={5000} anchorOrigin={{ vertical: "top", horizontal: "center" }}>
+        <Alert
+          severity={state.status ? "success" : "error"}
+          variant="filled"
+          sx={{ display: "flex", alignItems: "center", fontSize: "1.3rem" }}
+        >
+          {state.message}
+        </Alert>
+      </Snackbar>
       <div className={styles.formHead}>
         <h1>Sign up</h1>
         <p>Please register to start chat with your docs.</p>
@@ -34,7 +63,6 @@ const SignupForm = () => {
         action={formAction}
         component="form"
       >
-        <Typography color={"red"}>{state?.message}</Typography>
         <Box
           sx={{
             width: "100%",
@@ -67,31 +95,47 @@ const SignupForm = () => {
             sx={{ width: "100%" }}
             inputProps={{ style: { fontSize: "1.4rem" } }}
           />
-          <TextField
-            placeholder="Email"
-            name="email"
-            sx={{ width: "100%" }}
-            inputProps={{ style: { fontSize: "1.4rem" } }}
-          />
-          <TextField
-            placeholder="Password"
-            name="password"
-            sx={{ width: "100%" }}
-            type="password"
-            inputProps={{ style: { fontSize: "1.4rem" } }}
-          />
-          <TextField
-            placeholder="Confirm Password"
-            sx={{ width: "100%" }}
-            type="password"
-            inputProps={{ style: { fontSize: "1.4rem" } }}
-          />
+          <Box>
+            <TextField
+              placeholder="Email"
+              name="email"
+              sx={{ width: "100%" }}
+              inputProps={{ style: { fontSize: "1.4rem" } }}
+              error={state.fieldErrors?.email && state.fieldErrors.email.length > 0}
+            />
+            {state.fieldErrors?.email && state.fieldErrors.email.length > 0 && (
+              <Typography color="error">{state.fieldErrors.email[0]}</Typography>
+            )}
+          </Box>
+          <Box>
+            <TextField
+              placeholder="Password"
+              name="password"
+              sx={{ width: "100%" }}
+              type="password"
+              inputProps={{ style: { fontSize: "1.4rem" } }}
+              error={state.fieldErrors?.password && state.fieldErrors.password.length > 0}
+            />
+            {state.fieldErrors?.password && state.fieldErrors.password.length > 0 && (
+              <Typography color="error">{state.fieldErrors.password[0]}</Typography>
+            )}
+          </Box>
+          <Box>
+            <TextField
+              placeholder="Confirm Password"
+              name="confirmPassword"
+              sx={{ width: "100%" }}
+              type="password"
+              inputProps={{ style: { fontSize: "1.4rem" } }}
+              error={state.fieldErrors?.confirmPassword && state.fieldErrors.confirmPassword.length > 0}
+            />
+            {state.fieldErrors?.confirmPassword && state.fieldErrors.confirmPassword.length > 0 && (
+              <Typography color="error">{state.fieldErrors.confirmPassword[0]}</Typography>
+            )}
+          </Box>
         </Box>
 
-        <Button variant="contained" class={styles.signupbtn} type="submit">
-          Sign up
-        </Button>
-
+        <SignupButton />
       </Box>
     </div>
   );

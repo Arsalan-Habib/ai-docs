@@ -1,19 +1,17 @@
 "use client";
 
-// TODOS:
-// 1) upload files to s3, create vectors and store both in db
-// 2) select the group that you want to communicate with
-
 import React, { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import styles from "./uploadDocuments.module.css";
 import Button from "@/components/Button/Button";
-import { Box, Chip } from "@mui/material";
+import { Alert, AlertTitle, Box, Chip, CircularProgress, Snackbar } from "@mui/material";
 import Header from "@/components/Header/Header";
 import { useRouter } from "next/navigation";
 
 const UploadDocuments = () => {
   const [filesSrc, setFilesSrc] = useState<File[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useRouter();
 
   const onDrop = useCallback((acceptedFiles: any[]) => {
@@ -25,6 +23,7 @@ const UploadDocuments = () => {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setLoading(true);
 
     const formdata = new FormData();
 
@@ -42,12 +41,30 @@ const UploadDocuments = () => {
     const result = await res.json();
 
     if (result.success) {
-      navigate.push("/chat");
+      navigate.push(`/chat/${result.data.groupId}`);
     }
+
+    if (!result.success) {
+      setError(result.message);
+    }
+
+    setLoading(false);
   }
 
   return (
     <div>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={!!error}
+        sx={{ display: "flex", alignItems: "center", minWidth: "15%" }}
+        autoHideDuration={5000}
+        onClose={() => setError("")}
+      >
+        <Alert variant="filled" severity="error" sx={{ fontSize: "1.5rem", width: "100%" }}>
+          <AlertTitle sx={{ fontSize: "1.7rem" }}>Error</AlertTitle>
+          {error}
+        </Alert>
+      </Snackbar>
       <Header />
 
       <Box component="form" className={styles.root} onSubmit={handleSubmit}>
@@ -76,11 +93,12 @@ const UploadDocuments = () => {
           }}
         >
           {filesSrc.map((file, i) => {
-            return <Chip key={i} label={file.name} sx={{ fontSize: "1.4rem"}} />;
+            return <Chip key={i} label={file.name} sx={{ fontSize: "1.4rem" }} />;
           })}
         </div>
-        <Button class={styles.uploadbtn} type="submit">
-          Upload
+        <Button class={styles.uploadbtn} type="submit" disabled={loading || filesSrc.length === 0}>
+          {loading && <CircularProgress size={"1.5rem"} color="inherit" />}
+          <span>Upload</span>
         </Button>
       </Box>
     </div>
