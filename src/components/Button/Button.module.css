@@ -10,12 +10,19 @@
   width: 18.5rem;
   height: 5.2rem;
   font-size: 1.98rem;
+  transition: all 0.2s ease-in-out;
 }
 
 .contained {
   border: 1px solid transparent;
   background: var(--primary-color);
   color: white;
+}
+
+.contained:hover {
+  /* background: var(--text-primary-color); */
+  /* color: black; */
+  box-shadow: 4px 4px 10px var(--border-color);
 }
 
 .outlined {

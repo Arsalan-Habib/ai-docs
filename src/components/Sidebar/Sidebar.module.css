@@ -41,6 +41,11 @@
   padding: 1rem;
   width: 100%;
   font-size: 1.4rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.newchatbtn:hover {
+  box-shadow: 2px 4px 10px 0px rgba(0, 0, 0, 0.1);
 }
 
 .groupContainer {

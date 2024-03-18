@@ -1,6 +1,5 @@
 import { getServerSession } from "next-auth";
 import React from "react";
-import { NextResponse } from "next/server";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/utils/authOptions";
 

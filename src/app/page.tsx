@@ -33,12 +33,6 @@ export default async function Home() {
           it&apos;s fun!
         </p>
         <div className={styles.btnsContainer}>
-          {/* <Link href="/signup">
-            <Button variant="outlined">
-              <span>AI Docs</span>
-              <Visit />
-            </Button>
-          </Link> */}
           <Link href={href} passHref>
             <Button variant="contained">{!session ? "Sign In" : "Get Started"}</Button>
           </Link>

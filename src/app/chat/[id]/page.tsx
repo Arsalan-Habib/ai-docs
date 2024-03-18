@@ -1,64 +1,47 @@
-"use client";
-import AskQuestionForm from "@/components/AskQuestionForm/AskQuestionForm";
-import { ChatMessage } from "@/types";
-import { useEffect, useRef, useState } from "react";
-import styles from "./chat.module.css";
+import MessagesSection from "@/components/MessagesSection/MessagesSection";
+import PdfViewer from "@/components/PDFViewer/PDFViewer";
+import dbConnect from "@/lib/mongodb";
+import DocGroup from "@/schemas/DocGroup";
+import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-const Chat = ({ params }: { params: { id: string } }) => {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const messagesContainerRef = useRef<HTMLDivElement | null>(null);
-  const [loading, setLoading] = useState(false);
+const Bucket = process.env.AWS_BUCKET_NAME as string;
+const s3 = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
+  },
+});
 
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
-      const response = await fetch(`/api/chat/${params.id}`);
+const Chat = async ({ params }: { params: { id: string } }) => {
+  await dbConnect();
+  const docGroup = await DocGroup.findOne({ groupId: params.id });
 
-      const data = await response.json();
+  let fileUrls: string[] = [];
 
-      setMessages(data.data);
-      setLoading(false);
-    })();
-  }, [params.id]);
-
-  useEffect(() => {
-    if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+  if (docGroup) {
+    for (const file of docGroup.filenames) {
+      const command = new GetObjectCommand({ Bucket, Key: file });
+      const src = await getSignedUrl(s3, command, { expiresIn: 3600 });
+      fileUrls.push(src);
     }
-  }, [messages]);
+  }
+
+  console.log("fileUrl", fileUrls);
 
   return (
-    <div style={{ width: "100%", padding: "2rem 2rem" }}>
-      <div
-        style={{
-          maxWidth: "45%",
-          display: "flex",
-          flexDirection: "column",
-          gap: "1rem",
-          height: "100%",
-        }}
-      >
-        <div>
-          <h1>Chat Name</h1>
-        </div>
-        <div
-          ref={messagesContainerRef}
-          style={{
-            overflow: "auto",
-            flexGrow: 1,
-            maxHeight: "95%",
-          }}
-        >
-          {messages.map((message, i) => {
-            return (
-              <div key={i} className={message.type === "ai" ? styles.aiMsg : styles.humanMsg}>
-                <p>{message.data.content}</p>
-              </div>
-            );
-          })}
-        </div>
-        <AskQuestionForm setMessages={setMessages} messages={messages} id={params.id} />
-      </div>
+    <div
+      style={{
+        width: "100%",
+        height: "100vh",
+        padding: "2rem 2rem",
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+      }}
+    >
+      <MessagesSection params={params} />
+      <PdfViewer url={fileUrls[0]} />
     </div>
   );
 };
