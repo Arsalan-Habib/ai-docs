@@ -41,20 +41,3 @@ export default async function Home() {
     </div>
   );
 }
-
-// async function uploadFiles(e: React.FormEvent<HTMLFormElement>) {
-//   e.preventDefault();
-//   const formData = new FormData(e.currentTarget);
-
-//   const file = formData.get("file");
-
-//   console.log(URL.createObjectURL(file as Blob));
-
-//   const res = await fetch("/api/uploadFiles", {
-//     method: "POST",
-//     body: formData,
-//   });
-
-//   const result = await res.json();
-//   console.log(result);
-// }

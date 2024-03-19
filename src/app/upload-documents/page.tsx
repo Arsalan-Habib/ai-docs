@@ -37,7 +37,6 @@ const UploadDocuments = () => {
       body: formdata,
     });
 
-    // console.log(filesSrc);
     const result = await res.json();
 
     if (result.success) {

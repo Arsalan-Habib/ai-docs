@@ -8,6 +8,8 @@ import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
+import PDFMerger from "pdf-merger-js";
+import { Document } from "langchain/document";
 
 const Bucket = process.env.AWS_BUCKET_NAME as string;
 const s3 = new S3Client({
@@ -36,6 +38,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
   }
 
   const groupId = randomBytes(8).toString("hex");
+  const randomFilename = `${Date.now()}-${randomBytes(6).toString("hex")}.pdf`;
+  const merger = new PDFMerger();
 
   let filenames: string[] = [];
 
@@ -44,22 +48,36 @@ export async function POST(req: NextRequest, res: NextResponse) {
       const filename = `${Date.now()}-${file.name}`;
       const Body = (await file.arrayBuffer()) as Buffer;
       await s3.send(new PutObjectCommand({ Bucket, Key: filename, Body }));
-      const splitDocs = await loadAndSplitChunks({
-        fileUrl: file,
-      });
+      await merger.add(file);
 
-      const docs = splitDocs.map((doc) => ({
-        pageContent: doc.pageContent,
-        metadata: {
-          ...doc.metadata,
-          filename,
-          userId: session.user?.id,
-          groupId: groupId,
-        },
-      }));
-
-      vectorstore.addDocuments(docs);
       filenames.push(filename);
+    }),
+  );
+
+  const mergedPdfBuffer = await merger.saveAsBuffer();
+  const file = new File([mergedPdfBuffer], `${randomFilename}.pdf`, { type: "application/pdf" });
+
+  const splitDocs: Document[] = await loadAndSplitChunks({
+    fileUrl: file,
+  });
+
+  const docs = splitDocs.map((doc) => ({
+    pageContent: doc.pageContent,
+    metadata: {
+      ...doc.metadata,
+      filename: randomFilename,
+      userId: session.user?.id,
+      groupId: groupId,
+    },
+  }));
+
+  await vectorstore.addDocuments(docs);
+
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: Bucket,
+      Key: randomFilename,
+      Body: mergedPdfBuffer,
     }),
   );
 
@@ -68,10 +86,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
       userId: session.user?.id,
       groupId,
       filenames,
+      mergedFilename: randomFilename,
     });
   }
 
-  revalidatePath("/chat");
+  revalidatePath("/chat", "layout");
 
   return NextResponse.json({
     success: true,

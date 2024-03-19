@@ -19,3 +19,10 @@ export const getFileUrls = cache(async (groupId: string) => {
 
   return fileUrls;
 });
+
+export const getMergedFileUrl = cache(async (groupId: string) => {
+  const docGroup = await DocGroup.findOne({ groupId });
+  const command = new GetObjectCommand({ Bucket, Key: docGroup?.mergedFilename });
+  const src = await getSignedUrl(s3, command, { expiresIn: 3600 });
+  return src;
+});

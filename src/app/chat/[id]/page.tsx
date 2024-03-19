@@ -1,4 +1,4 @@
-import { getFileUrls } from "@/app/utils";
+import { getFileUrls, getMergedFileUrl } from "@/app/utils";
 import MessagesSection from "@/components/MessagesSection/MessagesSection";
 import PdfViewer from "@/components/PDFViewer/PDFViewer";
 import dbConnect from "@/lib/mongodb";
@@ -6,9 +6,7 @@ import dbConnect from "@/lib/mongodb";
 const Chat = async ({ params }: { params: { id: string } }) => {
   await dbConnect();
 
-  const fileUrls = await getFileUrls(params.id);
-
-  console.log("fileUrl", fileUrls);
+  const fileUrl = await getMergedFileUrl(params.id);
 
   return (
     <div
@@ -22,7 +20,7 @@ const Chat = async ({ params }: { params: { id: string } }) => {
       }}
     >
       <MessagesSection params={params} />
-      <PdfViewer url={fileUrls[0]} />
+      <PdfViewer url={fileUrl} />
     </div>
   );
 };

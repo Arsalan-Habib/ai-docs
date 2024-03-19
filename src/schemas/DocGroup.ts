@@ -4,6 +4,7 @@ export interface IDocGroup {
   userId: string;
   groupId: string;
   filenames: string[];
+  mergedFilename: string;
 }
 
 export const docGroupSchema = new mongoose.Schema<IDocGroup>({
@@ -16,6 +17,9 @@ export const docGroupSchema = new mongoose.Schema<IDocGroup>({
   },
   filenames: {
     type: [String],
+  },
+  mergedFilename: {
+    type: String,
   },
 });
 

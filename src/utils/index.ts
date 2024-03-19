@@ -4,14 +4,11 @@ import { OpenAIEmbeddings } from "@langchain/openai";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { MongoDBAtlasVectorSearch } from "@langchain/mongodb";
 import { MongoClient } from "mongodb";
-import { S3Client } from "@aws-sdk/client-s3";
 
 const embeddings = new OpenAIEmbeddings({
   modelName: "text-embedding-3-small",
   openAIApiKey: process.env.OPENAI_API_KEY,
 });
-
-// const vectorstore = new MemoryVectorStore(embeddings);
 
 export const client = new MongoClient(process.env.MONGODB_URI || "");
 const namespace = "data-bot.docs";
