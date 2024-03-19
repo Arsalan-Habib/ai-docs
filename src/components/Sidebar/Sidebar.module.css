@@ -3,6 +3,7 @@
   max-width: 25rem;
   border-right: 1px solid var(--secondary-color);
   height: 100%;
+  overflow: auto;
   padding: 1.6rem;
 }
 
