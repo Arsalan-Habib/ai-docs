@@ -10,6 +10,7 @@ import { redirect } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 import PDFMerger from "pdf-merger-js";
 import { Document } from "langchain/document";
+import { Blob } from "buffer";
 
 const Bucket = process.env.AWS_BUCKET_NAME as string;
 const s3 = new S3Client({
@@ -55,7 +56,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
   );
 
   const mergedPdfBuffer = await merger.saveAsBuffer();
-  const file = new File([mergedPdfBuffer], `${randomFilename}.pdf`, { type: "application/pdf" });
+  // const file = new File([mergedPdfBuffer], `${randomFilename}.pdf`, { type: "application/pdf" });
+  const file = new Blob([mergedPdfBuffer], { type: "application/pdf" });
 
   const splitDocs: Document[] = await loadAndSplitChunks({
     fileUrl: file,

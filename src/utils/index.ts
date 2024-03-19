@@ -4,6 +4,7 @@ import { OpenAIEmbeddings } from "@langchain/openai";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { MongoDBAtlasVectorSearch } from "@langchain/mongodb";
 import { MongoClient } from "mongodb";
+import { Blob } from "buffer";
 
 const embeddings = new OpenAIEmbeddings({
   modelName: "text-embedding-3-small",
@@ -39,7 +40,7 @@ export const loadAndSplitChunks = async ({
   chunkOverlap?: number;
   fileUrl: Blob;
 }) => {
-  const loader = new WebPDFLoader(fileUrl);
+  const loader = new WebPDFLoader(fileUrl as any);
   const rawDoc = await loader.load();
 
   const splitter = new RecursiveCharacterTextSplitter({
