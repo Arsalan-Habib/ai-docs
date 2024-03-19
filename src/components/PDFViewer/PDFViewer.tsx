@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
+import styles from "./PDFViewer.module.css";
 pdfjs.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
 function highlightPattern(text: string, pattern: string) {
@@ -24,8 +25,8 @@ export default function PdfViewer({ url }: { url: string }) {
   );
 
   return (
-    <div style={{ width: "100%", height: "90vh", overflow: "auto" }}>
-      <Document file={url} onLoadSuccess={onDocumentLoadSuccess}>
+    <div style={{ width: "100%", height: "95vh", overflow: "auto" }}>
+      <Document file={url} onLoadSuccess={onDocumentLoadSuccess} className={styles.pdfDoc}>
         {Array.from(new Array(numPages), (el, index) => (
           <Page key={`page_${index + 1}`} pageNumber={index + 1} customTextRenderer={textRenderer} />
         ))}

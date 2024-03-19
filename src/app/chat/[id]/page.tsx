@@ -36,8 +36,9 @@ const Chat = async ({ params }: { params: { id: string } }) => {
         width: "100%",
         height: "100vh",
         padding: "2rem 2rem",
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
+        display: "flex",
+        justifyContent: "space-between",
+        // gridTemplateColumns: "1fr 1fr",
       }}
     >
       <MessagesSection params={params} />

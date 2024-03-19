@@ -24,15 +24,15 @@ const MessagesSection = ({ params }: { params: { id: string } }) => {
 
   useEffect(() => {
     if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop =
-        messagesContainerRef.current.scrollHeight;
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
   }, [messages]);
 
   return (
     <div
       style={{
-        maxWidth: "100%",
+        width: "100%",
+        maxWidth: "50%",
         display: "flex",
         flexDirection: "column",
         gap: "1rem",
@@ -52,20 +52,13 @@ const MessagesSection = ({ params }: { params: { id: string } }) => {
       >
         {messages.map((message, i) => {
           return (
-            <div
-              key={i}
-              className={message.type === "ai" ? styles.aiMsg : styles.humanMsg}
-            >
+            <div key={i} className={message.type === "ai" ? styles.aiMsg : styles.humanMsg}>
               <p>{message.data.content}</p>
             </div>
           );
         })}
       </div>
-      <AskQuestionForm
-        setMessages={setMessages}
-        messages={messages}
-        id={params.id}
-      />
+      <AskQuestionForm setMessages={setMessages} messages={messages} id={params.id} />
     </div>
   );
 };
