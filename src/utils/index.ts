@@ -4,6 +4,7 @@ import { OpenAIEmbeddings } from "@langchain/openai";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { MongoDBAtlasVectorSearch } from "@langchain/mongodb";
 import { MongoClient } from "mongodb";
+import { S3Client } from "@aws-sdk/client-s3";
 
 const embeddings = new OpenAIEmbeddings({
   modelName: "text-embedding-3-small",

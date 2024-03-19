@@ -2,12 +2,22 @@ import React from "react";
 import styles from "./Sidebar.module.css";
 import Link from "next/link";
 import { IDocGroup } from "@/schemas/DocGroup";
+import { getFileUrls } from "@/app/utils";
+import { Document } from "mongoose";
+import { Document as PDFDoc, Page } from "react-pdf";
 
 interface SidebarProps {
   groups: IDocGroup[];
 }
 
-const Sidebar = ({ groups }: SidebarProps) => {
+const Sidebar = async ({ groups }: SidebarProps) => {
+  let groupsWithFileUrls = [];
+
+  for (const group of groups) {
+    const fileUrls = await getFileUrls(group.groupId);
+    groupsWithFileUrls.push({ ...((group as unknown as Document).toJSON() as IDocGroup), fileUrls });
+  }
+
   return (
     <div className={styles.root}>
       <Link href="/" style={{ textDecoration: "none", color: "black" }}>
@@ -33,16 +43,28 @@ const Sidebar = ({ groups }: SidebarProps) => {
       </Link>
 
       <div style={{ marginTop: "1.5rem" }}>
-        {groups.length > 0 ? (
-          groups.map((group) => {
+        {groupsWithFileUrls.length > 0 ? (
+          groupsWithFileUrls.map((group) => {
             return (
               <Link key={group.groupId} href={`/chat/${group.groupId}`}>
                 <div className={styles.groupContainer}>
-                  {group.filenames.map((filename, i) => {
+                  {group.fileUrls.map((url, i) => {
                     return (
-                      <p key={i} style={{ fontSize: "1.4rem" }}>
-                        {filename}
-                      </p>
+                      <PDFDoc
+                        file={url}
+                        className={styles.pdfDoc}
+                        key={i}
+                        renderMode="canvas"
+                        loading="Generating Thumbnail"
+                      >
+                        <Page
+                          key={`page_1`}
+                          pageNumber={1}
+                          className={styles.pdfPage}
+                          renderTextLayer={false}
+                          renderAnnotationLayer={false}
+                        />
+                      </PDFDoc>
                     );
                   })}
                 </div>
