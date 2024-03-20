@@ -8,7 +8,64 @@ import { MongoDBChatMessageHistory } from "@langchain/mongodb";
 import { ChatOpenAI } from "@langchain/openai";
 import { createStuffDocumentsChain } from "langchain/chains/combine_documents";
 import { getServerSession } from "next-auth";
+import { RunnableMap, RunnablePassthrough, RunnableSequence } from "@langchain/core/runnables";
 import { NextRequest, NextResponse } from "next/server";
+import { Document } from "langchain/document";
+import { JsonOutputKeyToolsParser } from "langchain/output_parsers";
+import { formatDocumentsAsString } from "langchain/util/document";
+
+import { z } from "zod";
+import { StructuredTool } from "@langchain/core/tools";
+import { formatToOpenAITool } from "@langchain/openai";
+
+const citationSchema = z.object({
+  sourceId: z.number().describe("The integer ID of a SPECIFIC source which justifies the answer."),
+  quote: z.string().describe("The VERBATIM quote from the specified source that justifies the answer."),
+});
+
+class QuotedAnswer extends StructuredTool {
+  name = "quoted_answer";
+
+  description = "Answer the user question based only on the given sources, and cite the sources used.";
+
+  schema = z.object({
+    answer: z.string().describe("The answer to the user question, which is based only on the given sources."),
+    citations: z.array(citationSchema).describe("Citations from the given sources that justify the answer."),
+  });
+
+  constructor() {
+    super();
+  }
+
+  _call(input: z.infer<(typeof this)["schema"]>): Promise<string> {
+    return Promise.resolve(JSON.stringify(input, null, 2));
+  }
+}
+
+const quotedAnswerTool = formatToOpenAITool(new QuotedAnswer());
+const tools2 = [quotedAnswerTool];
+
+class CitedAnswer extends StructuredTool {
+  name = "cited_answer";
+
+  description = "Answer the user question based only on the given sources, and cite the sources used.";
+
+  schema = z.object({
+    answer: z.string().describe("The answer to the user question, which is based only on the given sources."),
+    citations: z.array(z.number()).describe("The integer IDs of the SPECIFIC sources which justify the answer."),
+  });
+
+  constructor() {
+    super();
+  }
+
+  _call(input: z.infer<(typeof this)["schema"]>): Promise<string> {
+    return Promise.resolve(JSON.stringify(input, null, 2));
+  }
+}
+
+const asOpenAITool = formatToOpenAITool(new CitedAnswer());
+const tools1 = [asOpenAITool];
 
 const llm = new ChatOpenAI({
   modelName: "gpt-3.5-turbo",
@@ -20,6 +77,18 @@ const namespace = "data-bot.historymessages";
 const [dbName, collectionName] = namespace.split(".");
 
 const collection = client.db(dbName).collection(collectionName);
+
+const convertDocsToString = (documents: Document[]) => {
+  return documents
+    .map((doc) => {
+      return `
+      ===============
+      \n${doc.pageContent}\n
+      ===============
+      `;
+    })
+    .join("\n");
+};
 
 function iteratorToStream(iterator: any) {
   return new ReadableStream({
@@ -71,7 +140,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     k: 10,
     searchKwargs: {
       fetchK: 20,
-      lambda: 0.1,
+      lambda: 0.2,
     },
     filter: {
       postFilterPipeline: [
@@ -87,29 +156,46 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
   const result = await retriever.getRelevantDocuments(body.query);
 
+  const outputParser = new JsonOutputKeyToolsParser({
+    keyName: "quoted_answer",
+    returnSingle: true,
+  });
+
+  const llmWithTools = llm.bind({
+    tools: tools2,
+    tool_choice: quotedAnswerTool,
+  });
+
   const prompt = ChatPromptTemplate.fromMessages([
     [
       "system",
-      `You are a helpful AI assistant. Use the following pieces of context to answer the question at the end.
-      If you don't know the answer, just say you don't know. DO NOT try to make up an answer.
-      If the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context.
-      If there is no context provided to answer the question, DO NOT answer that question and politely respond that there is no context provided.
+      `You're a helpful AI assistant. Given a user question and some pdf document chunks, answer the user question. If none of the document chunks answer the question, just say you don't know.\n\nHere are the PDF document chunks:{context}
       
-      {context}
       `,
     ],
     new MessagesPlaceholder("history"),
     ["human", "{question}"],
   ]);
 
-  const ragChain = await createStuffDocumentsChain({
-    llm,
+  const ragChainFromDocs = RunnableSequence.from([
+    RunnablePassthrough.assign({
+      context: (input: any) => convertDocsToString(input.context),
+    }),
     prompt,
-    outputParser: new StringOutputParser(),
+    llmWithTools,
+    outputParser,
+  ]);
+
+  const ragChainWithSource = new RunnableMap({
+    steps: {
+      context: (input: any) => input.context,
+      question: (input: any) => input.question,
+      quoted_answer: ragChainFromDocs,
+    },
   });
 
   const chainWithHistory = new RunnableWithMessageHistory({
-    runnable: ragChain,
+    runnable: ragChainWithSource,
     getMessageHistory: (sessionId) =>
       new MongoDBChatMessageHistory({
         collection: collection as any,
@@ -119,21 +205,35 @@ export async function POST(req: NextRequest, res: NextResponse) {
     historyMessagesKey: "history",
   });
 
-  const output = await chainWithHistory.streamEvents(
+  // const output = await chainWithHistory.streamEvents(
+  //   {
+  //     question: body.query,
+  //     context: result,
+  //   },
+  //   {
+  //     version: "v1",
+  //     configurable: {
+  //       sessionId: body.groupId,
+  //     },
+  //   },
+  // );
+
+  // const iterator = makeIterator(output);
+  // const stream = iteratorToStream(iterator);
+
+  const output = await chainWithHistory.invoke(
     {
       question: body.query,
       context: result,
     },
     {
-      version: "v1",
       configurable: {
         sessionId: body.groupId,
       },
     },
   );
 
-  const iterator = makeIterator(output);
-  const stream = iteratorToStream(iterator);
+  console.log("output", output.quoted_answer.citations);
 
-  return new NextResponse(stream);
+  return new NextResponse(output.quoted_answer.answer);
 }
