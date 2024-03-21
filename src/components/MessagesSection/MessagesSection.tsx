@@ -4,8 +4,15 @@ import { ChatMessage } from "@/types";
 import React, { useEffect, useRef, useState } from "react";
 import AskQuestionForm from "../AskQuestionForm/AskQuestionForm";
 import styles from "./MessagesSection.module.css";
+import { useSearchParams } from "next/navigation";
 
-const MessagesSection = ({ params }: { params: { id: string } }) => {
+const MessagesSection = ({
+  params,
+  setSearchQuery,
+}: {
+  params: { id: string };
+  setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
+}) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
   const [loading, setLoading] = useState(false);
@@ -54,6 +61,34 @@ const MessagesSection = ({ params }: { params: { id: string } }) => {
           return (
             <div key={i} className={message.type === "ai" ? styles.aiMsg : styles.humanMsg}>
               <p>{message.data.content}</p>
+              {message.data.additional_kwargs && message.data.additional_kwargs.citations && (
+                <div style={{ marginTop: "0.5rem" }}>
+                  <h5>Sources:</h5>
+                  <div style={{ display: "flex", gap: "0.2rem", marginTop: "0.2rem", flexWrap: "wrap" }}>
+                    {message.data.additional_kwargs.citations.map((citation: any, i: number) => (
+                      <p
+                        onClick={() => setSearchQuery(citation.quote)}
+                        key={i}
+                        style={{
+                          cursor: "pointer",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          width: "25px",
+                          height: "25px",
+                          fontSize: "1.1rem",
+                          borderRadius: "50%",
+                          background: "#9ec8ff",
+                        }}
+                      >
+                        <pre>
+                          <code>{citation.id}</code>
+                        </pre>
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           );
         })}

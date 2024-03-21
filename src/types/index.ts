@@ -2,6 +2,7 @@ export interface ChatMessage {
   type: "human" | "ai";
   data: {
     content: string;
+    additional_kwargs?: Record<string, any>;
   };
 }
 

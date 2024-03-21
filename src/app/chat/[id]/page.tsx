@@ -1,6 +1,5 @@
 import { getFileUrls, getMergedFileUrl } from "@/app/utils";
-import MessagesSection from "@/components/MessagesSection/MessagesSection";
-import PdfViewer from "@/components/PDFViewer/PDFViewer";
+import ChatLayout from "@/components/ChatLayout/ChatLayout";
 import dbConnect from "@/lib/mongodb";
 
 const Chat = async ({ params }: { params: { id: string } }) => {
@@ -19,8 +18,7 @@ const Chat = async ({ params }: { params: { id: string } }) => {
         // gridTemplateColumns: "1fr 1fr",
       }}
     >
-      <MessagesSection params={params} />
-      <PdfViewer url={fileUrl} />
+      <ChatLayout fileUrl={fileUrl} params={params} />
     </div>
   );
 };

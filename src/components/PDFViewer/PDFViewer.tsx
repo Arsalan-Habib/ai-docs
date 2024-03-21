@@ -9,18 +9,17 @@ function highlightPattern(text: string, pattern: string) {
   return text.replace(pattern, (value) => `<mark>${value}</mark>`);
 }
 
-export default function PdfViewer({ url }: { url: string }) {
+export default function PdfViewer({ url, searchQuery }: { url: string; searchQuery: string }) {
   const [numPages, setNumPages] = useState<number | null>(null);
-  const [searchText, setSearchText] = useState(``);
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages);
   }
   const textRenderer = useCallback(
     (textItem: any) => {
-      return highlightPattern(textItem.str, searchText);
+      return highlightPattern(textItem.str, searchQuery);
     },
-    [searchText],
+    [searchQuery],
   );
 
   return (

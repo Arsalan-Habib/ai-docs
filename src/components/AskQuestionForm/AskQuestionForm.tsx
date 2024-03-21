@@ -57,6 +57,12 @@ const AskQuestionForm = ({
         return [...prev];
       });
     }
+
+    const response = await fetch(`/api/chat/${id}`);
+
+    const data = await response.json();
+
+    setMessages(data.data);
   };
 
   useEffect(() => {

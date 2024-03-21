@@ -46,6 +46,7 @@ export const loadAndSplitChunks = async ({
   const splitter = new RecursiveCharacterTextSplitter({
     chunkOverlap,
     chunkSize,
+    keepSeparator: true,
   });
 
   const splitDocs = await splitter.splitDocuments(rawDoc);
