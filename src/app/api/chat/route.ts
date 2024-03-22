@@ -13,24 +13,27 @@ import { NextRequest, NextResponse } from "next/server";
 import { Document } from "langchain/document";
 import { JsonOutputKeyToolsParser } from "langchain/output_parsers";
 import { formatDocumentsAsString } from "langchain/util/document";
+import { loadEvaluator } from "langchain/evaluation";
+
 import { type BaseMessage } from "langchain/schema";
+import { distance } from "ml-distance";
 
 import { z } from "zod";
 import { StructuredTool } from "@langchain/core/tools";
 import { formatToOpenAITool } from "@langchain/openai";
 
 class ExtendedMongoDBChatHistory extends MongoDBChatMessageHistory {
-  citations: any;
+  sources: any;
 
-  constructor({ citations, collection, sessionId }: any) {
+  constructor({ sources, collection, sessionId }: any) {
     super({ collection, sessionId });
 
-    this.citations = citations;
+    this.sources = sources;
   }
   async addMessage(message: BaseMessage) {
     if (message._getType() === "ai") {
       message.additional_kwargs = {
-        citations: this.citations,
+        sources: this.sources,
       };
     }
 
@@ -89,6 +92,12 @@ const convertDocsToString = (documents: Document[]) => {
     .join("\n");
 };
 
+const convertDocsToStringArr = (documents: Document[]) => {
+  return documents.map((doc) => {
+    return doc.pageContent;
+  });
+};
+
 function iteratorToStream(iterator: any) {
   return new ReadableStream({
     async pull(controller) {
@@ -138,8 +147,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
     searchType: "mmr",
     k: 10,
     searchKwargs: {
-      fetchK: 20,
-      lambda: 0.2,
+      fetchK: 10,
+      lambda: 0.1,
     },
     filter: {
       postFilterPipeline: [
@@ -229,6 +238,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
     question: body.query,
   });
 
+  const citationIds = citations.quoted_answer.citations.map((c: any) => c.sourceId);
+
+  const docs = result.filter((_, i) => citationIds.includes(i + 1));
+
   const chainWithHistory = new RunnableWithMessageHistory({
     runnable: ragChainAnswer,
 
@@ -236,7 +249,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       new ExtendedMongoDBChatHistory({
         collection: collection as any,
         sessionId: sessionId,
-        citations: citations.quoted_answer.citations,
+        sources: docs,
       }),
 
     inputMessagesKey: "question",
@@ -273,7 +286,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
   const iterator = makeIterator(output);
   const stream = iteratorToStream(iterator);
-  console.log("output", output);
 
   return new NextResponse(stream);
 }

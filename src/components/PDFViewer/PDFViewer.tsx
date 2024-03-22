@@ -5,8 +5,28 @@ import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 import styles from "./PDFViewer.module.css";
 
-function highlightPattern(text: string, pattern: string) {
-  return text.replace(pattern, (value) => `<mark>${value}</mark>`);
+function highlightPattern(text: any, pattern: string) {
+  const lines = pattern.split(/(\s*\n\s*|\s*\n\s*\n|\s*\n\n\s*)/);
+
+  // lines.forEach((line) => line.replaceAll(/\s+/g, " "));
+  for (let i = 0; i < lines.length; i++) {
+    lines[i] = lines[i].replaceAll(/\s+/g, " ");
+  }
+
+  const cleanLines = lines.filter((l) => l !== " ");
+
+  console.log("lines", cleanLines);
+
+  if (text.str === "") {
+    return text.str;
+  }
+
+  return text.str.replace(
+    cleanLines[cleanLines.findIndex((l) => l === text.str)],
+    (value: string) => `<mark>${value}</mark>`,
+  );
+
+  // return text.str;
 }
 
 export default function PdfViewer({ url, searchQuery }: { url: string; searchQuery: string }) {
@@ -17,7 +37,7 @@ export default function PdfViewer({ url, searchQuery }: { url: string; searchQue
   }
   const textRenderer = useCallback(
     (textItem: any) => {
-      return highlightPattern(textItem.str, searchQuery);
+      return highlightPattern(textItem, searchQuery);
     },
     [searchQuery],
   );
@@ -26,7 +46,11 @@ export default function PdfViewer({ url, searchQuery }: { url: string; searchQue
     <div style={{ width: "100%", height: "95vh", overflow: "auto" }}>
       <Document file={url} onLoadSuccess={onDocumentLoadSuccess} className={styles.pdfDoc}>
         {Array.from(new Array(numPages), (el, index) => (
-          <Page key={`page_${index + 1}`} pageNumber={index + 1} customTextRenderer={textRenderer} />
+          <Page
+            key={`page_${index + 1}`}
+            pageNumber={index + 1}
+            customTextRenderer={(textItem: any) => textRenderer(textItem)}
+          />
         ))}
       </Document>
     </div>

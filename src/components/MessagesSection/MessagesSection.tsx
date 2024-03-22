@@ -61,13 +61,13 @@ const MessagesSection = ({
           return (
             <div key={i} className={message.type === "ai" ? styles.aiMsg : styles.humanMsg}>
               <p>{message.data.content}</p>
-              {message.data.additional_kwargs && message.data.additional_kwargs.citations && (
+              {message.data.additional_kwargs && message.data.additional_kwargs.sources && (
                 <div style={{ marginTop: "0.5rem" }}>
                   <h5>Sources:</h5>
                   <div style={{ display: "flex", gap: "0.2rem", marginTop: "0.2rem", flexWrap: "wrap" }}>
-                    {message.data.additional_kwargs.citations.map((citation: any, i: number) => (
+                    {message.data.additional_kwargs.sources.map((source: any, i: number) => (
                       <p
-                        onClick={() => setSearchQuery(citation.quote)}
+                        onClick={() => setSearchQuery(source.pageContent)}
                         key={i}
                         style={{
                           cursor: "pointer",
@@ -82,7 +82,7 @@ const MessagesSection = ({
                         }}
                       >
                         <pre>
-                          <code>{citation.id}</code>
+                          <code>P#{source.metadata.loc.pageNumber}</code>
                         </pre>
                       </p>
                     ))}
