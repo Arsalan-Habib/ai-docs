@@ -61,34 +61,36 @@ const MessagesSection = ({
           return (
             <div key={i} className={message.type === "ai" ? styles.aiMsg : styles.humanMsg}>
               <p>{message.data.content}</p>
-              {message.data.additional_kwargs && message.data.additional_kwargs.sources && (
-                <div style={{ marginTop: "0.5rem" }}>
-                  <h5>Sources:</h5>
-                  <div style={{ display: "flex", gap: "0.2rem", marginTop: "0.2rem", flexWrap: "wrap" }}>
-                    {message.data.additional_kwargs.sources.map((source: any, i: number) => (
-                      <p
-                        onClick={() => setSearchQuery(source.pageContent)}
-                        key={i}
-                        style={{
-                          cursor: "pointer",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          width: "25px",
-                          height: "25px",
-                          fontSize: "1.1rem",
-                          borderRadius: "50%",
-                          background: "#9ec8ff",
-                        }}
-                      >
-                        <pre>
-                          <code>P#{source.metadata.loc.pageNumber}</code>
-                        </pre>
-                      </p>
-                    ))}
+              {message.data.additional_kwargs &&
+                message.data.additional_kwargs.sources &&
+                message.data.additional_kwargs.sources.length > 0 && (
+                  <div style={{ marginTop: "0.5rem" }}>
+                    <h5>Sources:</h5>
+                    <div style={{ display: "flex", gap: "0.2rem", marginTop: "0.2rem", flexWrap: "wrap" }}>
+                      {message.data.additional_kwargs.sources.map((source: any, i: number) => (
+                        <p
+                          onClick={() => setSearchQuery(source.pageContent)}
+                          key={i}
+                          style={{
+                            cursor: "pointer",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            width: "25px",
+                            height: "25px",
+                            fontSize: "1.1rem",
+                            borderRadius: "50%",
+                            background: "#9ec8ff",
+                          }}
+                        >
+                          <pre>
+                            <code>P#{source.metadata.loc.pageNumber}</code>
+                          </pre>
+                        </p>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
             </div>
           );
         })}

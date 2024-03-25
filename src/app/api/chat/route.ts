@@ -1,70 +1,27 @@
 import dbConnect from "@/lib/mongodb";
-import { client, sleep, vectorstore } from "@/utils";
+import { ExtendedMongoDBChatHistory, QuotedAnswer, client, sleep, vectorstore } from "@/utils";
 import { authOptions } from "@/utils/authOptions";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts";
-import { RunnableWithMessageHistory } from "@langchain/core/runnables";
+import {
+  RunnableMap,
+  RunnablePassthrough,
+  RunnableSequence,
+  RunnableWithMessageHistory,
+} from "@langchain/core/runnables";
 import { MongoDBChatMessageHistory } from "@langchain/mongodb";
-import { ChatOpenAI } from "@langchain/openai";
-import { createStuffDocumentsChain } from "langchain/chains/combine_documents";
-import { getServerSession } from "next-auth";
-import { RunnableMap, RunnablePassthrough, RunnableSequence } from "@langchain/core/runnables";
-import { NextRequest, NextResponse } from "next/server";
+import { ChatOpenAI, formatToOpenAITool } from "@langchain/openai";
 import { Document } from "langchain/document";
 import { JsonOutputKeyToolsParser } from "langchain/output_parsers";
-import { formatDocumentsAsString } from "langchain/util/document";
-import { loadEvaluator } from "langchain/evaluation";
+import { getServerSession } from "next-auth";
+import { NextRequest, NextResponse } from "next/server";
 
-import { type BaseMessage } from "langchain/schema";
-import { distance } from "ml-distance";
-
-import { z } from "zod";
-import { StructuredTool } from "@langchain/core/tools";
-import { formatToOpenAITool } from "@langchain/openai";
-
-class ExtendedMongoDBChatHistory extends MongoDBChatMessageHistory {
-  sources: any;
-
-  constructor({ sources, collection, sessionId }: any) {
-    super({ collection, sessionId });
-
-    this.sources = sources;
-  }
-  async addMessage(message: BaseMessage) {
-    if (message._getType() === "ai") {
-      message.additional_kwargs = {
-        sources: this.sources,
-      };
-    }
-
-    await super.addMessage(message);
-  }
-}
-
-const citationSchema = z.object({
-  id: z.string().describe("Unique ID for the source. for example: [T1], [T2], [T3] etc."),
-  sourceId: z.number().describe("The integer ID of a SPECIFIC source which justifies the answer."),
-  quote: z.string().describe("The VERBATIM quote from the specified source that justifies the answer."),
-});
-
-class QuotedAnswer extends StructuredTool {
-  name = "quoted_answer";
-
-  description = "Answer the user question based only on the given sources, and cite the sources used.";
-
-  schema = z.object({
-    answer: z.string().describe("The answer to the user question, which is based only on the given sources."),
-    citations: z.array(citationSchema).describe("Citations from the given sources that justify the answer."),
+const getMessageHistory = (sessionId: string, docs?: Document[]) =>
+  new ExtendedMongoDBChatHistory({
+    collection: collection as any,
+    sessionId: sessionId,
+    sources: docs,
   });
-
-  constructor() {
-    super();
-  }
-
-  _call(input: z.infer<(typeof this)["schema"]>): Promise<string> {
-    return Promise.resolve(JSON.stringify(input, null, 2));
-  }
-}
 
 const quotedAnswerTool = formatToOpenAITool(new QuotedAnswer());
 const tools2 = [quotedAnswerTool];
@@ -90,12 +47,6 @@ const convertDocsToString = (documents: Document[]) => {
       `;
     })
     .join("\n");
-};
-
-const convertDocsToStringArr = (documents: Document[]) => {
-  return documents.map((doc) => {
-    return doc.pageContent;
-  });
 };
 
 function iteratorToStream(iterator: any) {
@@ -147,7 +98,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     searchType: "mmr",
     k: 10,
     searchKwargs: {
-      fetchK: 10,
+      fetchK: 20,
       lambda: 0.1,
     },
     filter: {
@@ -192,22 +143,27 @@ export async function POST(req: NextRequest, res: NextResponse) {
     ["human", "{question}"],
   ]);
 
-  // const REPHRASE_QUESTION_SYSTEM_TEMPLATE = `
-  //   Given the following conversation and a follow up question,
-  //   rephrase the follow up question to be a standalone question.
-  // `;
+  const messageHistory = await getMessageHistory(body.groupId).getMessages();
 
-  // const rephraseQuestionChainPrompt = ChatPromptTemplate.fromMessages([
-  //   ["system", REPHRASE_QUESTION_SYSTEM_TEMPLATE],
-  //   new MessagesPlaceholder("history"),
-  //   ["human", "Rephrase the following question to be a standalone question:\n{question}"],
-  // ]);
+  const messageHistoryString = messageHistory
+    .map((message) => `${message._getType()}: ${message.content}`)
+    .join("\n\n");
 
-  // const rephraseQuestionChain = RunnableSequence.from([rephraseQuestionChainPrompt, llm, new StringOutputParser()]);
+  const followUpQuestionCheck = ChatPromptTemplate.fromTemplate(
+    `You are an expert in checking if the question asked by a user is a follow-up question or not. Given the user question and the chat history, check if the user question is a follow-up question or not. If the user question is a follow-up question, just say "Yes". If the user question is not a follow-up question, just say "No".\n\nQuestion: {question}\n\n Chat history: {history}`,
+  );
+
+  const followUpQuestionChain = RunnableSequence.from([followUpQuestionCheck, llm, new StringOutputParser()]);
+
+  const isFollowUpQuestion = await followUpQuestionChain.invoke({
+    question: body.query,
+    history: messageHistoryString,
+  });
 
   const ragChainFromDocs = RunnableSequence.from([
     RunnablePassthrough.assign({
       context: (input: any) => convertDocsToString(input.context),
+      question: (input: any) => input.question,
     }),
     citationPrompt,
     llmWithTools,
@@ -225,51 +181,31 @@ export async function POST(req: NextRequest, res: NextResponse) {
     new StringOutputParser(),
   ]);
 
-  const ragChainWithSource = new RunnableMap({
-    steps: {
-      context: (input: any) => input.context,
-      question: (input: any) => input.question,
-      quoted_answer: ragChainFromDocs,
-    },
-  });
+  let citations: any;
 
-  const citations = await ragChainWithSource.invoke({
-    context: result,
-    question: body.query,
-  });
+  if (isFollowUpQuestion.toLowerCase() === "yes") {
+    citations = {
+      citations: [],
+    };
+  } else {
+    citations = await ragChainFromDocs.invoke({
+      context: result,
+      question: body.query,
+    });
+  }
 
-  const citationIds = citations.quoted_answer.citations.map((c: any) => c.sourceId);
+  const citationIds = citations.citations.map((c: any) => c.sourceId);
 
   const docs = result.filter((_, i) => citationIds.includes(i + 1));
 
   const chainWithHistory = new RunnableWithMessageHistory({
     runnable: ragChainAnswer,
 
-    getMessageHistory: (sessionId) =>
-      new ExtendedMongoDBChatHistory({
-        collection: collection as any,
-        sessionId: sessionId,
-        sources: docs,
-      }),
+    getMessageHistory: (sessionId) => getMessageHistory(sessionId, docs),
 
     inputMessagesKey: "question",
     historyMessagesKey: "history",
-
-    // outputMessagesKey: "quoted_answer.answer",
   });
-
-  // const output = await chainWithHistory.streamEvents(
-  //   {
-  //     question: body.query,
-  //     context: result,
-  //   },
-  //   {
-  //     version: "v1",
-  //     configurable: {
-  //       sessionId: body.groupId,
-  //     },
-  //   },
-  // );
 
   const output = await chainWithHistory.streamEvents(
     {
