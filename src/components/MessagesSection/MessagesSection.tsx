@@ -11,7 +11,7 @@ const MessagesSection = ({
   setSearchQuery,
 }: {
   params: { id: string };
-  setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
+  setSearchQuery: React.Dispatch<React.SetStateAction<{ content: string; pageNumber: number } | undefined>>;
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
@@ -69,7 +69,9 @@ const MessagesSection = ({
                     <div style={{ display: "flex", gap: "0.2rem", marginTop: "0.2rem", flexWrap: "wrap" }}>
                       {message.data.additional_kwargs.sources.map((source: any, i: number) => (
                         <p
-                          onClick={() => setSearchQuery(source.pageContent)}
+                          onClick={() =>
+                            setSearchQuery({ content: source.pageContent, pageNumber: source.metadata.loc.pageNumber })
+                          }
                           key={i}
                           style={{
                             cursor: "pointer",

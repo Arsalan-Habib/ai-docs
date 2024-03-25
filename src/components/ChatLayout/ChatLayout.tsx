@@ -5,7 +5,13 @@ import MessagesSection from "../MessagesSection/MessagesSection";
 import PdfViewer from "../PDFViewer/PDFViewer";
 
 const ChatLayout = ({ params, fileUrl }: { params: { id: string }; fileUrl: string }) => {
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<
+    | {
+        content: string;
+        pageNumber: number;
+      }
+    | undefined
+  >(undefined);
 
   return (
     <>
