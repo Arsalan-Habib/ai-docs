@@ -1,31 +1,25 @@
 import React from "react";
 import styles from "./Sidebar.module.css";
 import Link from "next/link";
-import { IDocGroup } from "@/schemas/DocGroup";
+import { IDocGroup, IDocGroupWithFileUrls } from "@/schemas/DocGroup";
 import { getFileUrls } from "@/app/utils";
 import { Document } from "mongoose";
 import { Document as PDFDoc, Page } from "react-pdf";
+import { headers } from "next/headers";
+import SidebarTabs from "../SidebarTabs/SidebarTabs";
 
 interface SidebarProps {
-  groups: IDocGroup[];
+  groups: IDocGroupWithFileUrls[];
 }
 
 const Sidebar = async ({ groups }: SidebarProps) => {
-  let groupsWithFileUrls = [];
-
-  for (const group of groups) {
-    const fileUrls = await getFileUrls(group.groupId);
-    groupsWithFileUrls.push({ ...((group as unknown as Document).toJSON() as IDocGroup), fileUrls });
-  }
-
   return (
     <div className={styles.root}>
       <Link href="/" style={{ textDecoration: "none", color: "black" }}>
         <h1>AI Docs.</h1>
       </Link>
-      <div className={styles.libraryContainer}>
-        <p>Library</p>
-      </div>
+      <SidebarTabs />
+
       <Link href="/upload-documents">
         <button className={styles.newchatbtn}>
           <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21" fill="none">
@@ -43,8 +37,8 @@ const Sidebar = async ({ groups }: SidebarProps) => {
       </Link>
 
       <div style={{ marginTop: "1.5rem" }}>
-        {groupsWithFileUrls.length > 0 ? (
-          groupsWithFileUrls.map((group) => {
+        {groups.length > 0 ? (
+          groups.map((group) => {
             return (
               <Link key={group.groupId} href={`/chat/${group.groupId}`}>
                 <div className={styles.groupContainer}>

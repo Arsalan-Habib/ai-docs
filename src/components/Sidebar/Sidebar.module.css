@@ -15,19 +15,6 @@
   font-size: 3.2rem;
 }
 
-.libraryContainer {
-  margin-top: 2rem;
-  background: var(--secondary-color);
-  display: flex;
-  justify-content: center;
-  padding: 0.725rem;
-  border-radius: 0.8rem;
-}
-
-.libraryContainer p {
-  font-size: 1.6rem;
-}
-
 .newchatbtn {
   display: flex;
   align-items: center;

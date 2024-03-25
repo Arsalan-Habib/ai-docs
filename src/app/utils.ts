@@ -1,8 +1,9 @@
-import DocGroup from "@/schemas/DocGroup";
+import DocGroup, { IDocGroup } from "@/schemas/DocGroup";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Bucket, s3 } from "@/utils/constants";
 import { cache } from "react";
+import { Document } from "mongoose";
 
 export const getFileUrls = cache(async (groupId: string) => {
   const docGroup = await DocGroup.findOne({ groupId });
@@ -25,4 +26,17 @@ export const getMergedFileUrl = cache(async (groupId: string) => {
   const command = new GetObjectCommand({ Bucket, Key: docGroup?.mergedFilename });
   const src = await getSignedUrl(s3, command, { expiresIn: 3600 });
   return src;
+});
+
+export const getGroups = cache(async ({ userId }: { userId: string }) => {
+  const data: IDocGroup[] = await DocGroup.find({ userId: userId });
+
+  let groupsWithFileUrls = [];
+
+  for (const group of data) {
+    const fileUrls = await getFileUrls(group.groupId);
+    groupsWithFileUrls.push({ ...((group as unknown as Document).toJSON() as IDocGroup), fileUrls });
+  }
+
+  return groupsWithFileUrls;
 });

@@ -1,0 +1,17 @@
+.tabContainer {
+  margin-top: 2rem;
+  /* background: var(--secondary-color); */
+  display: flex;
+  justify-content: center;
+  padding: 0.725rem;
+  border-radius: 0.8rem;
+}
+
+.active {
+  background: var(--secondary-color);
+}
+
+.tabContainer p {
+  font-size: 1.6rem;
+  font-weight: bold;
+}

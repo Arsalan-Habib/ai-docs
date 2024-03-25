@@ -7,6 +7,10 @@ export interface IDocGroup {
   mergedFilename: string;
 }
 
+export interface IDocGroupWithFileUrls extends IDocGroup {
+  fileUrls: string[];
+}
+
 export const docGroupSchema = new mongoose.Schema<IDocGroup>({
   userId: {
     type: String,
