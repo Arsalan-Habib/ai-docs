@@ -16,7 +16,7 @@ const SidebarTabs = () => {
         </div>
       </Link>
       <Link href="/library" style={{ textDecoration: "none", color: "black" }}>
-        <div className={`${styles.tabContainer} ${pathname === "/library" ? styles.active : ""}`}>
+        <div className={`${styles.tabContainer} ${pathname.includes("/library") ? styles.active : ""}`}>
           <p>Library</p>
         </div>
       </Link>

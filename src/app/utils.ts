@@ -4,6 +4,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Bucket, s3 } from "@/utils/constants";
 import { cache } from "react";
 import { Document } from "mongoose";
+import Folder from "@/schemas/Folder";
 
 export const getFileUrls = cache(async (groupId: string) => {
   const docGroup = await DocGroup.findOne({ groupId });
@@ -39,4 +40,15 @@ export const getGroups = cache(async ({ userId }: { userId: string }) => {
   }
 
   return groupsWithFileUrls;
+});
+
+export const getFolders = cache(async ({ userId }: { userId: string }) => {
+  const folders = await Folder.find({ userId: userId });
+
+  return folders;
+});
+
+export const getFolder = cache(async ({ userId, folderId }: { userId: string; folderId: string }) => {
+  const folder = await Folder.findOne({ userId: userId, _id: folderId });
+  return folder;
 });

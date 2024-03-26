@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 export interface IDocGroup {
   userId: string;
   groupId: string;
+  groupName?: string;
+  folderId?: string;
   filenames: string[];
   mergedFilename: string;
 }
@@ -15,6 +17,12 @@ export const docGroupSchema = new mongoose.Schema<IDocGroup>({
   userId: {
     type: String,
     required: true,
+  },
+  groupName: {
+    type: String,
+  },
+  folderId: {
+    type: String,
   },
   groupId: {
     type: String,

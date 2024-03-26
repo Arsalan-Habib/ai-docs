@@ -26,6 +26,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
   const formData = await req.formData();
 
+  const folderId = formData.get("folderId");
+  const groupName = formData.get("groupName");
+
+  console.log({ folderId, groupName });
+
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -86,6 +91,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
   if (filenames.length > 0) {
     await DocGroup.create({
       userId: session.user?.id,
+      groupName: groupName || "Untitled",
+      folderId: folderId || undefined,
       groupId,
       filenames,
       mergedFilename: randomFilename,

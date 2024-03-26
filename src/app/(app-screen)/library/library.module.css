@@ -61,3 +61,8 @@
   font-size: 4rem;
   margin-top: -0.5rem;
 }
+
+.folder {
+  align-items: center;
+  padding: 1.4rem;
+}

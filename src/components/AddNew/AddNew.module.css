@@ -1,0 +1,51 @@
+.addNew {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  width: 120px;
+  height: 120px;
+  border: 2px solid var(--secondary-color);
+  border-radius: 0.8rem;
+}
+
+.addNew span {
+  font-weight: bold;
+  color: var(--secondary-color);
+  font-size: 4rem;
+  margin-top: -0.5rem;
+}
+
+.add {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  width: 160px;
+  background: rgba(229, 240, 255, 0.1);
+  height: 160px;
+  border: 4px dashed var(--secondary-color);
+  border-radius: 0.8rem;
+}
+
+.add span {
+  font-weight: bold;
+  color: var(--secondary-color);
+  font-size: 8rem;
+  margin-top: -0.5rem;
+}
+
+.closeBtn {
+  width: 3.6rem;
+  height: 3.6rem;
+  background: var(--secondary-color);
+  border-radius: 50%;
+  position: absolute !important;
+  font-size: 1.2rem;
+  /* background: transparent; */
+  border: none;
+  right: -2%;
+  top: 0%;
+}
