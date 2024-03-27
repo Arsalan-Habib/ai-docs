@@ -1,10 +1,3 @@
-.root {
-  margin-top: 2rem;
-  display: flex;
-  gap: 3rem;
-  flex-wrap: wrap;
-}
-
 .groupContainer {
   border: 2px solid var(--secondary-color);
   border-radius: 0.8rem;

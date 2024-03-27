@@ -1,16 +1,14 @@
 import dbConnect from "@/lib/mongodb";
 import DocGroup from "@/schemas/DocGroup";
-import { authOptions } from "@/utils/authOptions";
 import { loadAndSplitChunks, vectorstore } from "@/utils";
-import { PutBucketCorsCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { authOptions } from "@/utils/authOptions";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { Blob } from "buffer";
 import { randomBytes } from "crypto";
+import { Document } from "langchain/document";
 import { getServerSession } from "next-auth";
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 import PDFMerger from "pdf-merger-js";
-import { Document } from "langchain/document";
-import { Blob } from "buffer";
 
 const Bucket = process.env.AWS_BUCKET_NAME as string;
 const s3 = new S3Client({
@@ -99,13 +97,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
     });
   }
 
-  revalidatePath("/chat", "layout");
+  // revalidatePath("/chat", "layout");
 
   return NextResponse.json({
     success: true,
     message: "Uploaded Successfully",
     data: {
-      groupId,
+      groupId: 12312,
     },
   });
 }

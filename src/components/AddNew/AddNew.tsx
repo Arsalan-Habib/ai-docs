@@ -1,14 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
-import styles from "./AddNew.module.css";
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, Divider } from "@mui/material";
+import { Box, Dialog, DialogContent, Divider } from "@mui/material";
+import { useState } from "react";
+import AddDocumentsDialog from "../AddDocumentsDialog/AddDocumentsDialog";
 import AddFolderDialog from "../AddFolderDialog/AddFolderDialog";
+import styles from "./AddNew.module.css";
 
 const AddNew = () => {
   const [open, setOpen] = useState(false);
   const [openFolderModal, setOpenFolderModal] = useState(false);
+  const [openDocumentsModal, setDocumentsModal] = useState(false);
   const [formId, setFormId] = useState(() => crypto.randomUUID());
+  const [formId2, setFormId2] = useState(() => crypto.randomUUID());
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -50,7 +53,14 @@ const AddNew = () => {
               <h3>Add Folder</h3>
             </div>
             <Divider orientation="vertical" flexItem />
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}>
+            <div
+              style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}
+              onClick={() => {
+                setOpen(false);
+                setFormId2(crypto.randomUUID());
+                setDocumentsModal(true);
+              }}
+            >
               <div className={styles.add}>
                 <span>+</span>
               </div>
@@ -67,6 +77,8 @@ const AddNew = () => {
           setOpenFolderModal(false);
         }}
       />
+
+      <AddDocumentsDialog key={formId2} open={openDocumentsModal} handleClose={() => setDocumentsModal(false)} />
     </div>
   );
 };

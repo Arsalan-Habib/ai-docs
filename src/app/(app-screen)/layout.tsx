@@ -1,9 +1,8 @@
-import { getServerSession } from "next-auth";
-import React from "react";
-import DocGroup, { IDocGroup } from "@/schemas/DocGroup";
+import PDFWorker from "@/components/PDFWorker/PDFWorker";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import { authOptions } from "@/utils/authOptions";
-import PDFWorker from "@/components/PDFWorker/PDFWorker";
+import { getServerSession } from "next-auth";
+import React from "react";
 import { getGroups } from "../utils";
 
 export const revalidate = 3600;

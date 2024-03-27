@@ -1,6 +1,7 @@
 "use client";
 
 import { IFolder } from "@/schemas/Folder";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -28,7 +29,12 @@ const LibraryTitle = () => {
 
   return (
     <div>
-      <h1>Library {!!folder ? `> ${folder.name}` : ""}</h1>
+      <h1>
+        <Link href="/library" style={{ textDecoration: "none", color: "black" }}>
+          <span>Library</span>
+        </Link>{" "}
+        <span>{!!folder ? `> ${folder.name}` : ""}</span>
+      </h1>
     </div>
   );
 };

@@ -11,8 +11,6 @@ export async function addFolder(prevState: any, formdata: FormData) {
     await dbConnect();
     const session = await getServerSession(authOptions);
 
-    console.log("session", session);
-
     if (!session) {
       return {
         status: false,

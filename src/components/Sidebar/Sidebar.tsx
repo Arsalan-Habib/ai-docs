@@ -1,18 +1,21 @@
-import React from "react";
-import styles from "./Sidebar.module.css";
+"use client";
+
+import { IDocGroupWithFileUrls } from "@/schemas/DocGroup";
 import Link from "next/link";
-import { IDocGroup, IDocGroupWithFileUrls } from "@/schemas/DocGroup";
-import { getFileUrls } from "@/app/utils";
-import { Document } from "mongoose";
+import { useParams } from "next/navigation";
 import { Document as PDFDoc, Page } from "react-pdf";
-import { headers } from "next/headers";
 import SidebarTabs from "../SidebarTabs/SidebarTabs";
+import styles from "./Sidebar.module.css";
 
 interface SidebarProps {
   groups: IDocGroupWithFileUrls[];
 }
 
-const Sidebar = async ({ groups }: SidebarProps) => {
+const Sidebar = ({ groups }: SidebarProps) => {
+  const params = useParams();
+
+  const selectedGroup = groups.filter((group) => group.groupId === params.id);
+
   return (
     <div className={styles.root}>
       <Link href="/" style={{ textDecoration: "none", color: "black" }}>
@@ -37,10 +40,10 @@ const Sidebar = async ({ groups }: SidebarProps) => {
       </Link>
 
       <div style={{ marginTop: "1.5rem" }}>
-        {groups.length > 0 ? (
-          groups.map((group) => {
+        {selectedGroup.length > 0 ? (
+          selectedGroup.map((group, j) => {
             return (
-              <Link key={group.groupId} href={`/chat/${group.groupId}`}>
+              <Link key={j} href={`/chat/${group.groupId}`}>
                 <div className={styles.groupContainer}>
                   {group.fileUrls.map((url, i) => {
                     return (
@@ -66,7 +69,9 @@ const Sidebar = async ({ groups }: SidebarProps) => {
             );
           })
         ) : (
-          <p>No groups found</p>
+          <p style={{ fontSize: "1.4rem" }}>
+            Select a group from <b>library</b> to start chat
+          </p>
         )}
       </div>
     </div>

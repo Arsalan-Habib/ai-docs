@@ -9,8 +9,8 @@
   border: 2px solid var(--secondary-color);
   border-radius: 0.8rem;
   padding: 1rem;
-  width: 120px;
-  height: 120px;
+  width: 160px;
+  height: 160px;
   margin-bottom: 1rem;
   display: flex;
   /* grid-template-columns: 1fr 1fr;
@@ -49,8 +49,8 @@
   justify-content: center;
   align-items: center;
   padding: 1rem;
-  width: 120px;
-  height: 120px;
+  width: 160px;
+  height: 160px;
   border: 2px solid var(--secondary-color);
   border-radius: 0.8rem;
 }

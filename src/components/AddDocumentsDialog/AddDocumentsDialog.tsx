@@ -1,64 +1,58 @@
 "use client";
 
-import { Box, Chip, Dialog, DialogContent, TextField } from "@mui/material";
-import styles from "./AddDocumentsDialog.module.css";
-import { useCallback, useState } from "react";
-import { useDropzone } from "react-dropzone";
+import { uploadFiles } from "@/actions/uploadFiles";
+import { Box, Chip, CircularProgress, Dialog, DialogContent, TextField } from "@mui/material";
 import { useParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useFormStatus } from "react-dom";
+import { useDropzone } from "react-dropzone";
+import styles from "./AddDocumentsDialog.module.css";
 
-const initialState = {
-  status: false,
-  message: "",
+const UploadButton = () => {
+  const { pending } = useFormStatus();
+
+  return (
+    <button className={styles.createBtn} disabled={pending}>
+      {pending && <CircularProgress size={"1.2rem"} color="inherit" />}
+      <span>Upload</span>
+    </button>
+  );
 };
 
 const AddDocumentsDialog = ({ open, handleClose }: { open: boolean; handleClose: () => void }) => {
   const [filesSrc, setFilesSrc] = useState<File[]>([]);
   const params = useParams();
   const [groupName, setGroupName] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const onDrop = useCallback((acceptedFiles: any[]) => {
-    setFilesSrc((files) => [...files, ...acceptedFiles]);
+  const formdata = useMemo(() => new FormData(), []);
+  formdata.append("folderId", params.folderId as string);
 
-    // Do something with the files
-  }, []);
+  const onDrop = useCallback(
+    (acceptedFiles: any[]) => {
+      setFilesSrc((files) => [...files, ...acceptedFiles]);
+
+      for (let i = 0; i < acceptedFiles.length; i++) {
+        formdata.append("file", acceptedFiles[i]);
+      }
+    },
+    [formdata],
+  );
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setLoading(true);
-
-    const formdata = new FormData();
-
-    formdata.append("groupName", groupName);
-    formdata.append("folderId", params.folderId as string);
-
-    for (let i = 0; i < filesSrc.length; i++) {
-      formdata.append("file", filesSrc[i]);
+  useEffect(() => {
+    if (groupName.length > 0) {
+      if (formdata.get("groupName")) {
+        formdata.delete("groupName");
+      }
+      formdata.append("groupName", groupName);
     }
-
-    console.log(formdata.getAll("file"), formdata.get("groupName"), formdata.get("folderId"));
-
-    const res = await fetch("/api/upload-files", {
-      method: "POST",
-      body: formdata,
-    });
-
-    const result = await res.json();
-
-    if (!result.success) {
-      setError(result.message);
-    }
-
-    setLoading(false);
-  }
+  }, [groupName, formdata]);
 
   return (
     <Dialog fullWidth={true} maxWidth={"sm"} open={open} onClose={handleClose}>
       <DialogContent>
         <Box
           component="form"
-          onSubmit={handleSubmit}
+          action={() => uploadFiles(formdata)}
           sx={{
             width: "100%",
             padding: "4rem",
@@ -94,7 +88,7 @@ const AddDocumentsDialog = ({ open, handleClose }: { open: boolean; handleClose:
               }}
             />
             <div {...getRootProps()} className={styles.dropzone}>
-              <input {...getInputProps()} />
+              <input {...getInputProps()} name="file" />
               {isDragActive ? (
                 <p>Drop the files here ...</p>
               ) : (
@@ -106,7 +100,7 @@ const AddDocumentsDialog = ({ open, handleClose }: { open: boolean; handleClose:
                       <p style={{ marginBottom: "1rem" }}>
                         Drag &apos;n&apos; drop some files here, or click to select files
                       </p>
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", justifyContent: "center" }}>
                         {filesSrc.map((file, i) => {
                           return <Chip key={i} label={file.name} />;
                         })}
@@ -117,8 +111,7 @@ const AddDocumentsDialog = ({ open, handleClose }: { open: boolean; handleClose:
               )}
             </div>
           </div>
-
-          <button className={styles.createBtn}>Upload</button>
+          <UploadButton />
         </Box>
       </DialogContent>
     </Dialog>
