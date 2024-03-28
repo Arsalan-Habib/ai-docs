@@ -4,7 +4,6 @@ import { ChatMessage } from "@/types";
 import React, { useEffect, useRef, useState } from "react";
 import AskQuestionForm from "../AskQuestionForm/AskQuestionForm";
 import styles from "./MessagesSection.module.css";
-import { useSearchParams } from "next/navigation";
 
 const MessagesSection = ({
   params,

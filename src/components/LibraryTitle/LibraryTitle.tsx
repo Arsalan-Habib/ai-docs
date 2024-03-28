@@ -66,10 +66,11 @@ const LibraryTitle = () => {
         sx={{
           px: 2,
           py: 1,
+
           fontSize: "2rem",
           width: "40rem",
           backgroundColor: "rgba(229, 240, 255, 0.1)",
-          borderRadius: "0.5rem",
+          borderRadius: "1rem",
           border: `1px solid rgba(83, 93, 107, 0.8)`,
         }}
         InputProps={{
