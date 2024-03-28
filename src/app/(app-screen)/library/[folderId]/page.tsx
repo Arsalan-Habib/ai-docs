@@ -5,12 +5,20 @@ import { authOptions } from "@/utils/authOptions";
 import { getServerSession } from "next-auth";
 import styles from "./styles.module.css";
 
-const Folder = async ({ params }: { params: { folderId: string } }) => {
+const Folder = async ({
+  params,
+  searchParams,
+}: {
+  params: { folderId: string };
+  searchParams?: { query?: string };
+}) => {
   const session = await getServerSession(authOptions);
 
   const groups = await getGroups({ userId: session?.user?.id as string });
 
-  const folderGroups = groups.filter((group) => group.folderId === params.folderId);
+  const folderGroups = groups
+    .filter((group) => group.folderId === params.folderId)
+    .filter((group) => group.groupName?.toLowerCase().includes(searchParams?.query?.toLowerCase() || ""));
 
   return (
     <div className={styles.root}>

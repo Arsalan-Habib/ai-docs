@@ -7,9 +7,7 @@ import { getServerSession } from "next-auth";
 import Link from "next/link";
 import styles from "./library.module.css";
 
-export const revalidate = false;
-
-const Library = async () => {
+const Library = async ({ searchParams }: { searchParams?: { query?: string } }) => {
   const session = await getServerSession(authOptions);
 
   const groupsData = getGroups({ userId: session?.user?.id as string });
@@ -17,15 +15,21 @@ const Library = async () => {
 
   const [groups, folders] = await Promise.all([groupsData, foldersData]);
 
-  const groupsWithNoFolder = groups.filter((group) => group.folderId === "undefined");
+  const groupsWithNoFolder = groups
+    .filter((group) => group.folderId === "undefined")
+    .filter((group) => group.groupName?.toLowerCase().includes(searchParams?.query?.toLowerCase() || ""));
+
+  const filteredFolders = folders.filter((folder) =>
+    folder.name?.toLowerCase().includes(searchParams?.query?.toLowerCase() || ""),
+  );
 
   return (
     <div className={styles.root}>
       <div className={styles.mainContainer}>
         <div style={{ marginTop: "1.5rem", display: "flex", gap: "2rem", flexWrap: "wrap" }}>
           <>
-            {folders.length > 0 &&
-              folders.map((folder, i) => {
+            {filteredFolders.length > 0 &&
+              filteredFolders.map((folder, i) => {
                 return (
                   <Link key={i} href={`/library/${folder._id}`} style={{ textDecoration: "none", color: "black" }}>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>

@@ -1,16 +1,12 @@
-import Visit from "@/icons/Visit";
-import Link from "next/link";
-import styles from "./page.module.css";
 import Button from "@/components/Button/Button";
-import Chip from "@/components/Chip/Chip";
-import Image from "next/image";
-import { getServerSession } from "next-auth";
-import { signOut } from "next-auth/react";
-import SignInOutBtn from "@/components/SignInOutBtn/SignInOutBtn";
 import Header from "@/components/Header/Header";
+import dbConnect from "@/lib/mongodb";
 import DocGroup from "@/schemas/DocGroup";
 import { authOptions } from "@/utils/authOptions";
-import dbConnect from "@/lib/mongodb";
+import { getServerSession } from "next-auth";
+import Image from "next/image";
+import Link from "next/link";
+import styles from "./page.module.css";
 
 export default async function Home() {
   await dbConnect();
@@ -18,7 +14,7 @@ export default async function Home() {
 
   const docsGroup = session && (await DocGroup.find({ userId: session.user?.id }));
 
-  const href = session ? (docsGroup && docsGroup.length > 0 ? "/chat" : "/upload-documents") : "/signin";
+  const href = session ? (docsGroup && docsGroup.length > 0 ? "/library" : "/upload-documents") : "/signin";
 
   return (
     <div>

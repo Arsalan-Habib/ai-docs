@@ -9,8 +9,10 @@ import { useSearchParams } from "next/navigation";
 const MessagesSection = ({
   params,
   setSearchQuery,
+  groupTitle,
 }: {
   params: { id: string };
+  groupTitle: string;
   setSearchQuery: React.Dispatch<React.SetStateAction<{ content: string; pageNumber: number } | undefined>>;
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -47,7 +49,7 @@ const MessagesSection = ({
       }}
     >
       <div>
-        <h1>Chat Name</h1>
+        <h1>{groupTitle}</h1>
       </div>
       <div
         ref={messagesContainerRef}

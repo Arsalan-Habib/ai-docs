@@ -4,15 +4,15 @@ import { uploadFiles } from "@/actions/uploadFiles";
 import { Box, Chip, CircularProgress, Dialog, DialogContent, TextField } from "@mui/material";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useFormStatus } from "react-dom";
+import { useFormState, useFormStatus } from "react-dom";
 import { useDropzone } from "react-dropzone";
 import styles from "./AddDocumentsDialog.module.css";
 
-const UploadButton = () => {
+const UploadButton = ({ canUpload }: { canUpload: boolean }) => {
   const { pending } = useFormStatus();
 
   return (
-    <button className={styles.createBtn} disabled={pending}>
+    <button className={styles.createBtn} disabled={pending || !canUpload}>
       {pending && <CircularProgress size={"1.2rem"} color="inherit" />}
       <span>Upload</span>
     </button>
@@ -111,7 +111,7 @@ const AddDocumentsDialog = ({ open, handleClose }: { open: boolean; handleClose:
               )}
             </div>
           </div>
-          <UploadButton />
+          <UploadButton canUpload={filesSrc.length > 0} />
         </Box>
       </DialogContent>
     </Dialog>

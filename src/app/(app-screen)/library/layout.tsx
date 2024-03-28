@@ -5,7 +5,7 @@ export const revalidate = 3600;
 
 const LibraryLayout = async ({ children }: { children: React.ReactNode }) => {
   return (
-    <div style={{ padding: "2rem" }}>
+    <div style={{ padding: "2rem", width: "100%" }}>
       <LibraryTitle />
 
       {children}
