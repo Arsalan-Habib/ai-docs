@@ -16,6 +16,8 @@ import { JsonOutputKeyToolsParser } from "langchain/output_parsers";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
+export const runtime = "edge";
+
 const getMessageHistory = (sessionId: string, docs?: Document[]) =>
   new ExtendedMongoDBChatHistory({
     collection: collection as any,
