@@ -9,6 +9,11 @@
   height: 160px;
   border: 2px solid var(--secondary-color);
   border-radius: 0.8rem;
+  transition: all 0.3s ease;
+}
+
+.addNew:hover {
+  box-shadow: 4px 4px 10px 2px rgba(0, 0, 0, 0.1);
 }
 
 .addNew span {
@@ -29,6 +34,7 @@
   height: 160px;
   border: 4px dashed var(--secondary-color);
   border-radius: 0.8rem;
+  transition: all 0.3s ease;
 }
 
 .add span {
@@ -49,4 +55,8 @@
   border: none;
   right: -2%;
   top: 0%;
+}
+
+.addContainer:hover .add {
+  box-shadow: 4px 4px 10px 2px rgba(0, 0, 0, 0.1);
 }

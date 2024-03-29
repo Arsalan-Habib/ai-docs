@@ -40,6 +40,7 @@ const AddNew = () => {
             }}
           >
             <div
+              className={styles.addContainer}
               style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}
               onClick={() => {
                 setOpen(false);
@@ -54,6 +55,7 @@ const AddNew = () => {
             </div>
             <Divider orientation="vertical" flexItem />
             <div
+              className={styles.addContainer}
               style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}
               onClick={() => {
                 setOpen(false);
