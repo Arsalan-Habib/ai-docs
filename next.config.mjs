@@ -10,11 +10,6 @@ const nextConfig = {
     config.resolve.alias.encoding = false;
     return config;
   },
-  experimental: {
-    serverActions: {
-      bodySizeLimit: "50mb",
-    },
-  },
 
   images: {
     remotePatterns: [
