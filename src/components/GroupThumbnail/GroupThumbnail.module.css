@@ -14,6 +14,22 @@
   gap: 1rem;
   margin-bottom: 1rem;
 }
+.groupContainerFixed {
+  border: 2px solid var(--secondary-color);
+  border-radius: 0.8rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  min-width: 160px;
+  min-height: 160px;
+  max-width: 350px;
+  max-height: 100%;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  grid-template-rows: repeat(1, 1fr);
+  border-radius: 0.8rem;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
 
 .pdfDoc {
   border: 2px solid var(--secondary-color);
