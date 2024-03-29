@@ -52,7 +52,7 @@ const AddDocumentsDialog = ({ open, handleClose }: { open: boolean; handleClose:
 
       for (let i = 0; i < acceptedFiles.length; i++) {
         const filename = `${Date.now()}-${acceptedFiles[i].name}`;
-        formdata.append("file", acceptedFiles[i]);
+        // formdata.append("file", acceptedFiles[i]);
         formdata.append("filename", filename);
         const clientUrl = await createPresignedUrl({ key: filename });
 
@@ -86,12 +86,12 @@ const AddDocumentsDialog = ({ open, handleClose }: { open: boolean; handleClose:
 
       await new Promise((resolve) => setTimeout(resolve, 3000));
 
-      const files = formdata.getAll("file") as File[];
+      // const files = formdata.getAll("file") as File[];
 
       const merger = new PDFMerger();
 
       await Promise.all(
-        files.map(async (file, i) => {
+        filesSrc.map(async (file, i) => {
           const Body = (await file.arrayBuffer()) as Buffer;
           await uploadFile(preSignedUrls[i], Body);
 
