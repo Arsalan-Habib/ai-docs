@@ -1,11 +1,9 @@
-import PDFWorker from "@/components/PDFWorker/PDFWorker";
-import Sidebar from "@/components/Sidebar/Sidebar";
 import { authOptions } from "@/utils/authOptions";
 import { getServerSession } from "next-auth";
 import React from "react";
 import { getGroups } from "../utils";
-
-export const revalidate = 3600;
+import PDFWorker from "@/components/PDFWorker/PDFWorker";
+import Sidebar from "@/components/Sidebar/Sidebar";
 
 const ChatLayout = async ({ children }: { children: React.ReactNode }) => {
   const session = await getServerSession(authOptions);
