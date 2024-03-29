@@ -1,19 +1,37 @@
 "use client";
 
-import { uploadFiles } from "@/actions/uploadFiles";
+import { createPresignedUrl } from "@/actions/createPreSignedUrl";
 import { Box, Chip, CircularProgress, Dialog, DialogContent, TextField } from "@mui/material";
-import { useParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { randomBytes } from "crypto";
+import { useParams, useRouter } from "next/navigation";
+import PDFMerger from "pdf-merger-js/browser";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import styles from "./AddDocumentsDialog.module.css";
 
-const UploadButton = ({ canUpload }: { canUpload: boolean }) => {
-  const { pending } = useFormStatus();
+async function uploadFile(url: string, data: ArrayBuffer) {
+  try {
+    const res = await fetch(url, {
+      method: "PUT",
+      headers: { "Content-Length": new Blob([data]).size.toString() },
+      body: data,
+    });
 
+    if (!res.ok) {
+      throw new Error("Failed to upload file");
+    }
+
+    return res;
+  } catch (error: any) {
+    console.log("error", error);
+    throw new Error(error);
+  }
+}
+
+const UploadButton = ({ canUpload, loading }: { canUpload: boolean; loading: boolean }) => {
   return (
-    <button className={styles.createBtn} disabled={pending || !canUpload}>
-      {pending && <CircularProgress size={"1.2rem"} color="inherit" />}
+    <button className={styles.createBtn} disabled={!canUpload || loading} type="submit">
+      {loading && <CircularProgress size={"1.2rem"} color="inherit" />}
       <span>Upload</span>
     </button>
   );
@@ -22,16 +40,23 @@ const UploadButton = ({ canUpload }: { canUpload: boolean }) => {
 const AddDocumentsDialog = ({ open, handleClose }: { open: boolean; handleClose: () => void }) => {
   const [filesSrc, setFilesSrc] = useState<File[]>([]);
   const params = useParams();
+  const [loading, setLoading] = useState(false);
+  const [preSignedUrls, setPresignedUrls] = useState<string[]>([]);
+  const router = useRouter();
   const [groupName, setGroupName] = useState("");
   const formdata = useMemo(() => new FormData(), []);
-  formdata.append("folderId", params.folderId as string);
 
   const onDrop = useCallback(
-    (acceptedFiles: any[]) => {
+    async (acceptedFiles: any[]) => {
       setFilesSrc((files) => [...files, ...acceptedFiles]);
 
       for (let i = 0; i < acceptedFiles.length; i++) {
+        const filename = `${Date.now()}-${acceptedFiles[i].name}`;
         formdata.append("file", acceptedFiles[i]);
+        formdata.append("filename", filename);
+        const clientUrl = await createPresignedUrl({ key: filename });
+
+        setPresignedUrls((prevUrls) => [...prevUrls, clientUrl]);
       }
     },
     [formdata],
@@ -47,12 +72,63 @@ const AddDocumentsDialog = ({ open, handleClose }: { open: boolean; handleClose:
     }
   }, [groupName, formdata]);
 
+  useEffect(() => {
+    if (formdata.get("folderId")) {
+      formdata.delete("folderId");
+    }
+    formdata.append("folderId", params.folderId as string);
+  }, [formdata, params.folderId]);
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    try {
+      e.preventDefault();
+      setLoading(true);
+
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+
+      const files = formdata.getAll("file") as File[];
+
+      const merger = new PDFMerger();
+
+      await Promise.all(
+        files.map(async (file, i) => {
+          const Body = (await file.arrayBuffer()) as Buffer;
+          await uploadFile(preSignedUrls[i], Body);
+
+          await merger.add(file);
+        }),
+      );
+
+      const mergedPdfBuffer = await merger.saveAsBuffer();
+      const randomFilename = `${Date.now()}-${randomBytes(6).toString("hex")}.pdf`;
+
+      formdata.append("mergedFilename", randomFilename);
+
+      const mergedPdfPresignedUrl = await createPresignedUrl({ key: randomFilename });
+
+      await uploadFile(mergedPdfPresignedUrl, mergedPdfBuffer);
+
+      const res = await fetch("/api/upload-files", {
+        method: "POST",
+        body: formdata,
+      });
+
+      const data = await res.json();
+
+      setLoading(false);
+      handleClose();
+      router.refresh();
+    } catch (error) {
+      console.log("error", error);
+    }
+  }
+
   return (
     <Dialog fullWidth={true} maxWidth={"sm"} open={open} onClose={handleClose}>
       <DialogContent>
         <Box
           component="form"
-          action={() => uploadFiles(formdata)}
+          onSubmit={handleSubmit}
           sx={{
             width: "100%",
             padding: "4rem",
@@ -111,7 +187,7 @@ const AddDocumentsDialog = ({ open, handleClose }: { open: boolean; handleClose:
               )}
             </div>
           </div>
-          <UploadButton canUpload={filesSrc.length > 0} />
+          <UploadButton canUpload={filesSrc.length > 0} loading={loading} />
         </Box>
       </DialogContent>
     </Dialog>

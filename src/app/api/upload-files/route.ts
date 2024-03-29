@@ -2,13 +2,14 @@ import dbConnect from "@/lib/mongodb";
 import DocGroup from "@/schemas/DocGroup";
 import { loadAndSplitChunks, vectorstore } from "@/utils";
 import { authOptions } from "@/utils/authOptions";
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Blob } from "buffer";
 import { randomBytes } from "crypto";
 import { Document } from "langchain/document";
 import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
-import PDFMerger from "pdf-merger-js";
 
 const Bucket = process.env.AWS_BUCKET_NAME as string;
 const s3 = new S3Client({
@@ -19,13 +20,15 @@ const s3 = new S3Client({
   },
 });
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
   await dbConnect();
 
   const formData = await req.formData();
 
   const folderId = formData.get("folderId");
   const groupName = formData.get("groupName");
+  const filenames = formData.getAll("filename");
+  const mergedFilename = formData.get("mergedFilename");
 
   console.log({ folderId, groupName });
 
@@ -35,56 +38,37 @@ export async function POST(req: NextRequest, res: NextResponse) {
     return NextResponse.json({ success: false, message: "Login to upload" });
   }
 
-  const files = formData.getAll("file") as File[];
+  const files = formData.getAll("filename");
 
   if (files.length === 0) {
     return NextResponse.json({ success: false, message: "No files found" });
   }
 
   const groupId = randomBytes(8).toString("hex");
-  const randomFilename = `${Date.now()}-${randomBytes(6).toString("hex")}.pdf`;
-  const merger = new PDFMerger();
 
-  let filenames: string[] = [];
+  const command = new GetObjectCommand({ Bucket, Key: mergedFilename as string });
+  const src = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
-  await Promise.all(
-    files.map(async (file) => {
-      const filename = `${Date.now()}-${file.name}`;
-      const Body = (await file.arrayBuffer()) as Buffer;
-      await s3.send(new PutObjectCommand({ Bucket, Key: filename, Body }));
-      await merger.add(file);
+  const response = await fetch(src);
+  const mergedPdfBuffer = await response.arrayBuffer();
 
-      filenames.push(filename);
-    }),
-  );
-
-  const mergedPdfBuffer = await merger.saveAsBuffer();
-  // const file = new File([mergedPdfBuffer], `${randomFilename}.pdf`, { type: "application/pdf" });
   const file = new Blob([mergedPdfBuffer], { type: "application/pdf" });
 
   const splitDocs: Document[] = await loadAndSplitChunks({
-    fileUrl: file,
+    fileUrl: file as any,
   });
 
   const docs = splitDocs.map((doc) => ({
     pageContent: doc.pageContent,
     metadata: {
       ...doc.metadata,
-      filename: randomFilename,
+      filename: mergedFilename,
       userId: session.user?.id,
       groupId: groupId,
     },
   }));
 
   await vectorstore.addDocuments(docs);
-
-  await s3.send(
-    new PutObjectCommand({
-      Bucket: Bucket,
-      Key: randomFilename,
-      Body: mergedPdfBuffer,
-    }),
-  );
 
   if (filenames.length > 0) {
     await DocGroup.create({
@@ -93,17 +77,17 @@ export async function POST(req: NextRequest, res: NextResponse) {
       folderId: folderId || undefined,
       groupId,
       filenames,
-      mergedFilename: randomFilename,
+      mergedFilename: mergedFilename,
     });
   }
 
-  // revalidatePath("/chat", "layout");
+  revalidatePath("/library");
 
   return NextResponse.json({
     success: true,
     message: "Uploaded Successfully",
     data: {
-      groupId: 12312,
+      groupId: groupId,
     },
   });
 }
