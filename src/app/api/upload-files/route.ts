@@ -20,6 +20,8 @@ const s3 = new S3Client({
   },
 });
 
+export const maxDuration = 300;
+
 export async function POST(req: NextRequest) {
   await dbConnect();
 
@@ -29,8 +31,6 @@ export async function POST(req: NextRequest) {
   const groupName = formData.get("groupName");
   const filenames = formData.getAll("filename");
   const mergedFilename = formData.get("mergedFilename");
-
-  console.log({ folderId, groupName });
 
   const session = await getServerSession(authOptions);
 
