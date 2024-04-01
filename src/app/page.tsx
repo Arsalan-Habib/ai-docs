@@ -1,7 +1,6 @@
 import Button from "@/components/Button/Button";
 import Header from "@/components/Header/Header";
 import dbConnect from "@/lib/mongodb";
-import DocGroup from "@/schemas/DocGroup";
 import { authOptions } from "@/utils/authOptions";
 import { getServerSession } from "next-auth";
 import Image from "next/image";
@@ -12,9 +11,7 @@ export default async function Home() {
   await dbConnect();
   const session = await getServerSession(authOptions);
 
-  const docsGroup = session && (await DocGroup.find({ userId: session.user?.id }));
-
-  const href = session ? (docsGroup && docsGroup.length > 0 ? "/library" : "/upload-documents") : "/signin";
+  const href = session ? "/library" : "/signin";
 
   return (
     <div>
