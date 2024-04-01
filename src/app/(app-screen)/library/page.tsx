@@ -6,6 +6,7 @@ import { authOptions } from "@/utils/authOptions";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
 import styles from "./library.module.css";
+import EditDeleteButtons from "@/components/EditDeleteButtons/EditDeleteButtons";
 
 const Library = async ({ searchParams }: { searchParams?: { query?: string } }) => {
   const session = await getServerSession(authOptions);
@@ -31,14 +32,25 @@ const Library = async ({ searchParams }: { searchParams?: { query?: string } }) 
             {filteredFolders.length > 0 &&
               filteredFolders.map((folder, i) => {
                 return (
-                  <Link key={i} href={`/library/${folder._id}`} style={{ textDecoration: "none", color: "black" }}>
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                      <div className={`${styles.groupContainer} ${styles.folder}`}>
-                        <FolderIcon />
+                  <div key={i} style={{ position: "relative" }} className={styles.folderContainer}>
+                    <EditDeleteButtons
+                      folderId={folder._id}
+                      className={styles.editDeleteBtn}
+                      folderName={folder.name}
+                    />
+
+                    <Link
+                      href={`/library/${folder._id}`}
+                      style={{ textDecoration: "none", color: "black", position: "relative" }}
+                    >
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                        <div className={`${styles.groupContainer} ${styles.folder}`}>
+                          <FolderIcon />
+                        </div>
+                        <h3>{folder.name}</h3>
                       </div>
-                      <h3>{folder.name}</h3>
-                    </div>
-                  </Link>
+                    </Link>
+                  </div>
                 );
               })}
           </>

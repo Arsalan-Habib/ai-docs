@@ -66,3 +66,15 @@
   align-items: center;
   padding: 1.4rem;
 }
+
+.editDeleteBtn {
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.folderContainer:hover .editDeleteBtn {
+  opacity: 1;
+  pointer-events: all;
+  /* transition: all 0.3s ease; */
+}
