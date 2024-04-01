@@ -50,7 +50,8 @@ const AskQuestionForm = ({
 
     for await (const chunk of streamingFetch(res)) {
       setMessages((prev) => {
-        if (!prev[messages.length + 1]) {
+        if (prev[messages.length + 1].type === "loading") {
+          prev.pop();
           prev.push({ type: "ai", data: { content: chunk } });
         } else {
           prev[messages.length + 1].data.content += chunk;
@@ -88,6 +89,12 @@ const AskQuestionForm = ({
             type: "human",
             data: {
               content: message,
+            },
+          },
+          {
+            type: "loading",
+            data: {
+              content: "Please wait while your query is being processed...",
             },
           },
         ]);

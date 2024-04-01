@@ -1,5 +1,5 @@
 export interface ChatMessage {
-  type: "human" | "ai";
+  type: "human" | "ai" | "loading";
   data: {
     content: string;
     additional_kwargs?: Record<string, any>;

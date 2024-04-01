@@ -60,7 +60,10 @@ const MessagesSection = ({
       >
         {messages.map((message, i) => {
           return (
-            <div key={i} className={message.type === "ai" ? styles.aiMsg : styles.humanMsg}>
+            <div
+              key={i}
+              className={message.type === "ai" || message.type === "loading" ? styles.aiMsg : styles.humanMsg}
+            >
               <p>{message.data.content}</p>
               {message.data.additional_kwargs &&
                 message.data.additional_kwargs.sources &&
