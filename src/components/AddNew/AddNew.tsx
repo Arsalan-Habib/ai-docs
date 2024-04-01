@@ -1,6 +1,9 @@
 "use client";
 
-import { Box, Dialog, DialogContent, Divider } from "@mui/material";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import Divider from "@mui/material/Divider";
+import Box from "@mui/material/Box";
 import { useState } from "react";
 import AddDocumentsDialog from "../AddDocumentsDialog/AddDocumentsDialog";
 import AddFolderDialog from "../AddFolderDialog/AddFolderDialog";

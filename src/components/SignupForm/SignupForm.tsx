@@ -1,7 +1,13 @@
 "use client";
 
 import { createUser } from "@/actions/createUser";
-import { Alert, Box, CircularProgress, Snackbar, TextField, Typography } from "@mui/material";
+import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
+import Snackbar from "@mui/material/Snackbar";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+
 import { useFormState, useFormStatus } from "react-dom";
 import Button from "../Button/Button";
 import styles from "./SignupForm.module.css";

@@ -1,6 +1,9 @@
 "use client";
 
-import { Box, CircularProgress, Divider, TextField } from "@mui/material";
+import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
+import Divider from "@mui/material/Divider";
+import TextField from "@mui/material/TextField";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { FormEvent, Suspense, useState } from "react";

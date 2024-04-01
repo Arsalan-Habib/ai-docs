@@ -1,7 +1,12 @@
 "use client";
 
 import { createPresignedUrl } from "@/actions/createPreSignedUrl";
-import { Box, Chip, CircularProgress, Dialog, DialogContent, TextField } from "@mui/material";
+import DialogContent from "@mui/material/DialogContent";
+import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
+import Chip from "@mui/material/Chip";
+import Dialog from "@mui/material/Dialog";
 import { randomBytes } from "crypto";
 import { useParams, useRouter } from "next/navigation";
 import PDFMerger from "pdf-merger-js/browser";

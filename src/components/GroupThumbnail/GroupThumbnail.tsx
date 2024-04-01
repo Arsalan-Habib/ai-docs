@@ -3,14 +3,12 @@ import Link from "next/link";
 import React from "react";
 import { Document as PDFDoc, Page } from "react-pdf";
 import styles from "./GroupThumbnail.module.css";
-import { Badge } from "@mui/material";
+import Badge from "@mui/material/Badge";
 
 const GroupThumbnail = ({ group }: { group: IDocGroupWithFileUrls }) => {
   const fileUrls = group.fileUrls.filter((_, i) => i <= 3);
 
   const remainingFiles = group.fileUrls.length - fileUrls.length;
-
-  console.log("remainingFiles", remainingFiles);
 
   return (
     <Link

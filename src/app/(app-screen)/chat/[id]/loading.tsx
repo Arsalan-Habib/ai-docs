@@ -1,74 +1,64 @@
 "use client";
-import { Skeleton, Typography } from "@mui/material";
+import Skeleton from "@mui/material/Skeleton";
 import styles from "./chat.module.css";
 
 const Loading = () => {
   return (
     <div style={{ width: "100%", padding: "2rem", maxWidth: "50%" }}>
       <Skeleton variant="rounded">
-        <Typography sx={{ width: "100%" }} variant="h3">
-          asjdhasjkdhasjkdhasjkdhjasdhasjkh
-        </Typography>
+        <h3 style={{ width: "100%" }}>asjdhasjkdhasjkdhasjkdhjasdhasjkh</h3>
       </Skeleton>
       <div style={{ marginTop: "2rem" }}>
         <div className={styles.humanMsg}>
           <Skeleton>
-            <Typography variant="body1">asdasjdhasjdhasjdhajksdh</Typography>
+            <p>asdasjdhasjdhasjdhajksdh</p>
           </Skeleton>
         </div>
         <div className={styles.aiMsg}>
           <Skeleton>
-            <Typography variant="body1">
+            <p>
               asdasjdhasjdhasjdhajksdhadhasjkdhajksdhajksdhajksdhajksdhjkashdajksdhasjkdhasjkdhasjkdhasjkdhasjkdhasjkdhasjkdhasjkdhashjkdhasjkdasjdhajkasjdh
-            </Typography>
+            </p>
           </Skeleton>
           <Skeleton>
-            <Typography variant="body1">
+            <p>
               asdasjdhasjdhasjdhajksdhadhasjkdhajksdhajksdhajksdhajksdhjkashdajksdhasjkdhasjkdhasjkdhasjkdhasjkdhasjkdhasjkdhasjkdhashjkdhasjkdasjdhajkasjdh
-            </Typography>
+            </p>
           </Skeleton>
           <Skeleton>
-            <Typography variant="body1">dhasjkdhasjkdhasjkdhasjkdhasjkdhashjkdhasjkdasjdhajkasjdh</Typography>
+            <p>dhasjkdhasjkdhasjkdhasjkdhasjkdhashjkdhasjkdasjdhajkasjdh</p>
           </Skeleton>
         </div>
         <div className={styles.humanMsg}>
           <Skeleton>
-            <Typography variant="body1">asdasjdhasjdhasjdhajksdh</Typography>
+            <p>asdasjdhasjdhasjdhajksdh</p>
           </Skeleton>
         </div>
         <div className={styles.aiMsg}>
           <Skeleton>
-            <Typography variant="body1">
-              asdasjdhasjdhasjdhajksdhasgdashgdashgdashgdahsgddasdhgasgasgashgdashgdasghasdgashgasdhgd
-            </Typography>
+            <p>asdasjdhasjdhasjdhajksdhasgdashgdashgdashgdahsgddasdhgasgasgashgdashgdasghasdgashgasdhgd</p>
           </Skeleton>
           <Skeleton>
-            <Typography variant="body1">
-              asdasjdhasjdhasjdhajksdhasgdashgdashgdashgdahsgddasdhgasgasgashgdashgdasghasdgashgasdhgd
-            </Typography>
+            <p>asdasjdhasjdhasjdhajksdhasgdashgdashgdashgdahsgddasdhgasgasgashgdashgdasghasdgashgasdhgd</p>
           </Skeleton>
           <Skeleton>
-            <Typography variant="body1">adhasjkdhasjkdhjkashdjkashdjkhasjkdha</Typography>
+            <p>adhasjkdhasjkdhjkashdjkashdjkhasjkdha</p>
           </Skeleton>
         </div>
         <div className={styles.humanMsg}>
           <Skeleton>
-            <Typography variant="body1">asdasjdhasjdhasjdhajksdh</Typography>
+            <p>asdasjdhasjdhasjdhajksdh</p>
           </Skeleton>
         </div>
         <div className={styles.aiMsg}>
           <Skeleton>
-            <Typography variant="body1">
-              asdasjdhasjdhasjdhajksdhasgdashgdashgdashgdahsgddasdhgasgasgashgdashgdasghasdgashgasdhgd
-            </Typography>
+            <p>asdasjdhasjdhasjdhajksdhasgdashgdashgdashgdahsgddasdhgasgasgashgdashgdasghasdgashgasdhgd</p>
           </Skeleton>
           <Skeleton>
-            <Typography variant="body1">
-              asdasjdhasjdhasjdhajksdhasgdashgdashgdashgdahsgddasdhgasgasgashgdashgdasghasdgashgasdhgd
-            </Typography>
+            <p>asdasjdhasjdhasjdhajksdhasgdashgdashgdashgdahsgddasdhgasgasgashgdashgdasghasdgashgasdhgd</p>
           </Skeleton>
           <Skeleton>
-            <Typography variant="body1">adhasjkdhasjkdhjkashdjkashdjkhasjkdha</Typography>
+            <p>adhasjkdhasjkdhjkashdjkashdjkhasjkdha</p>
           </Skeleton>
         </div>
       </div>

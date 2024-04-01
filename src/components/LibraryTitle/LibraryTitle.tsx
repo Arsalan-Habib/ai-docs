@@ -2,7 +2,7 @@
 
 import SearchIcon from "@/icons/SearchIcon";
 import { IFolder } from "@/schemas/Folder";
-import { TextField } from "@mui/material";
+import TextField from "@mui/material/TextField";
 import Link from "next/link";
 import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";

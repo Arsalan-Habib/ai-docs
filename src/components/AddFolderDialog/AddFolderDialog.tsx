@@ -1,6 +1,9 @@
 "use client";
 
-import { Box, Button, Dialog, DialogContent, TextField } from "@mui/material";
+import DialogContent from "@mui/material/DialogContent/DialogContent";
+import TextField from "@mui/material/TextField/TextField";
+import Dialog from "@mui/material/Dialog/Dialog";
+import Box from "@mui/material/Box/Box";
 import React, { useEffect } from "react";
 import styles from "./AddFolderDialog.module.css";
 import { useFormState } from "react-dom";

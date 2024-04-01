@@ -1,7 +1,9 @@
 "use client";
 
 import { ChatMessage } from "@/types";
-import { Box, TextField, Typography } from "@mui/material";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import React, { useEffect, useState } from "react";
 import styles from "./AskQuestionForm.module.css";
 import { useRouter } from "next/navigation";

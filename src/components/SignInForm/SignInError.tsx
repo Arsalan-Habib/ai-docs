@@ -1,7 +1,9 @@
 "use client";
 
 import { AuthErrorTypes } from "@/types";
-import { Alert, AlertTitle, Snackbar } from "@mui/material";
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
+import Snackbar from "@mui/material/Snackbar";
 import { useSearchParams } from "next/navigation";
 import React from "react";
 
