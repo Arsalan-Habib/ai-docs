@@ -2,7 +2,6 @@ import DocGroup from "@/schemas/DocGroup";
 import Docs from "@/schemas/Docs";
 import Folder from "@/schemas/Folder";
 import { authOptions } from "@/utils/authOptions";
-import { Query } from "mongoose";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -55,7 +54,6 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
     await DocGroup.deleteMany({ folderId: params.id, userId: session?.user?.id });
 
     const groupIds = groupsInFolder.map((group: any) => group.groupId);
-    console.log("groupIds", groupIds);
 
     await Docs.deleteMany({ groupId: { $in: groupIds }, userId: session?.user?.id });
 
