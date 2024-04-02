@@ -21,7 +21,7 @@ const Button = ({
   const className = variant === "outlined" ? styles.outlined : styles.contained;
 
   return (
-    <button className={`${styles.root} ${className} ${myClass}`} type={type} disabled={disabled}>
+    <button className={`${styles.root} ${className} ${myClass}`} type={type} disabled={disabled} onClick={onClick}>
       {children}
     </button>
   );

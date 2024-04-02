@@ -2,10 +2,12 @@
 
 import { IDocGroupWithFileUrls } from "@/schemas/DocGroup";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Document as PDFDoc, Page } from "react-pdf";
 import SidebarTabs from "../SidebarTabs/SidebarTabs";
 import styles from "./Sidebar.module.css";
+import Button from "../Button/Button";
+import { signOut } from "next-auth/react";
 
 interface SidebarProps {
   groups: IDocGroupWithFileUrls[];
@@ -13,6 +15,7 @@ interface SidebarProps {
 
 const Sidebar = ({ groups }: SidebarProps) => {
   const params = useParams();
+  const router = useRouter();
 
   const selectedGroup = groups.filter((group) => group.groupId === params.id);
 
@@ -38,42 +41,54 @@ const Sidebar = ({ groups }: SidebarProps) => {
           <span>New Chat</span>
         </button>
       </Link>
-
-      <div style={{ marginTop: "1.5rem" }}>
-        {selectedGroup.length > 0 ? (
-          selectedGroup.map((group, j) => {
-            return (
-              <Link key={j} href={`/chat/${group.groupId}`}>
-                <div className={styles.groupContainer}>
-                  {group.fileUrls.map((url, i) => {
-                    return (
-                      <PDFDoc
-                        file={url}
-                        className={styles.pdfDoc}
-                        key={i}
-                        renderMode="canvas"
-                        loading="Generating Thumbnail"
-                      >
-                        <Page
-                          key={`page_1`}
-                          pageNumber={1}
-                          className={styles.pdfPage}
-                          renderTextLayer={false}
-                          renderAnnotationLayer={false}
-                        />
-                      </PDFDoc>
-                    );
-                  })}
-                </div>
-              </Link>
-            );
-          })
-        ) : (
-          <p style={{ fontSize: "1.4rem" }}>
-            Select a group from <b>library</b> to start chat
-          </p>
-        )}
+      <div className={styles.mainContainer}>
+        <div style={{ marginTop: "1.5rem" }}>
+          {selectedGroup.length > 0 ? (
+            selectedGroup.map((group, j) => {
+              return (
+                <Link key={j} href={`/chat/${group.groupId}`}>
+                  <div className={styles.groupContainer}>
+                    {group.fileUrls.map((url, i) => {
+                      return (
+                        <PDFDoc
+                          file={url}
+                          className={styles.pdfDoc}
+                          key={i}
+                          renderMode="canvas"
+                          loading="Generating Thumbnail"
+                        >
+                          <Page
+                            key={`page_1`}
+                            pageNumber={1}
+                            className={styles.pdfPage}
+                            renderTextLayer={false}
+                            renderAnnotationLayer={false}
+                          />
+                        </PDFDoc>
+                      );
+                    })}
+                  </div>
+                </Link>
+              );
+            })
+          ) : (
+            <p style={{ fontSize: "1.4rem" }}>
+              Select a group from <b>library</b> to start chat
+            </p>
+          )}
+        </div>
       </div>
+      <Button
+        variant="contained"
+        onClick={async () => {
+          await signOut({
+            redirect: true,
+            callbackUrl: "/",
+          });
+        }}
+      >
+        Logout
+      </Button>
     </div>
   );
 };
