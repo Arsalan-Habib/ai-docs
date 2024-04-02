@@ -3,13 +3,7 @@ import { ExtendedMongoDBChatHistory, QuotedAnswer, client, sleep, vectorstore } 
 import { authOptions } from "@/utils/authOptions";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts";
-import {
-  RunnableMap,
-  RunnablePassthrough,
-  RunnableSequence,
-  RunnableWithMessageHistory,
-} from "@langchain/core/runnables";
-import { MongoDBChatMessageHistory } from "@langchain/mongodb";
+import { RunnablePassthrough, RunnableSequence, RunnableWithMessageHistory } from "@langchain/core/runnables";
 import { ChatOpenAI, formatToOpenAITool } from "@langchain/openai";
 import { Document } from "langchain/document";
 import { JsonOutputKeyToolsParser } from "langchain/output_parsers";
@@ -30,6 +24,7 @@ const llm = new ChatOpenAI({
   modelName: "gpt-3.5-turbo",
   temperature: 0,
   streaming: true,
+  cache: true,
 });
 
 const namespace = "data-bot.historymessages";
@@ -83,9 +78,11 @@ async function* makeIterator(res: any) {
 }
 
 export async function POST(req: NextRequest, res: NextResponse) {
+  console.time("connection");
   await dbConnect();
   const session = await getServerSession(authOptions);
   const body = await req.json();
+  console.timeEnd("connection");
 
   if (!session) {
     return NextResponse.json({
@@ -94,7 +91,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     });
   }
 
-  const retriever = await vectorstore.asRetriever({
+  const retriever = vectorstore.asRetriever({
     searchType: "mmr",
     k: 10,
     searchKwargs: {
@@ -113,7 +110,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
     },
   });
 
+  console.time("Relevant Documents Fetch");
   const result = await retriever.getRelevantDocuments(body.query);
+  console.timeEnd("Relevant Documents Fetch");
 
   const outputParser = new JsonOutputKeyToolsParser({
     keyName: "quoted_answer",
@@ -143,7 +142,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
     ["human", "{question}"],
   ]);
 
+  console.time("Get Message History");
   const messageHistory = await getMessageHistory(body.groupId).getMessages();
+  console.timeEnd("Get Message History");
 
   const messageHistoryString = messageHistory
     .map((message) => `${message._getType()}: ${message.content}`)
@@ -155,10 +156,12 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
   const followUpQuestionChain = RunnableSequence.from([followUpQuestionCheck, llm, new StringOutputParser()]);
 
+  console.time("Follow up question chain invoke");
   const isFollowUpQuestion = await followUpQuestionChain.invoke({
     question: body.query,
     history: messageHistoryString,
   });
+  console.timeEnd("Follow up question chain invoke");
 
   const ragChainFromDocs = RunnableSequence.from([
     RunnablePassthrough.assign({
@@ -183,6 +186,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
   let citations: any;
 
+  console.time("Get Citations Invoke");
   if (isFollowUpQuestion.toLowerCase() === "yes") {
     citations = {
       citations: [],
@@ -193,6 +197,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       question: body.query,
     });
   }
+  console.timeEnd("Get Citations Invoke");
 
   const citationIds = citations.citations.map((c: any) => c.sourceId);
 
@@ -207,7 +212,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
     historyMessagesKey: "history",
   });
 
-  const output = await chainWithHistory.streamEvents(
+  console.time("Answer Stream");
+  const output = chainWithHistory.streamEvents(
     {
       question: body.query,
       context: result,
@@ -219,6 +225,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       },
     },
   );
+  console.timeEnd("Answer Stream");
 
   const iterator = makeIterator(output);
   const stream = iteratorToStream(iterator);
