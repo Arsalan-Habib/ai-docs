@@ -22,7 +22,7 @@ const SignInForm = () => {
 
     await signIn("credentials", {
       redirect: true,
-      callbackUrl: "/",
+      callbackUrl: "/library",
       email: formdata.get("email"),
       password: formdata.get("password"),
     });
