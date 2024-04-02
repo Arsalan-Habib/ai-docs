@@ -19,7 +19,7 @@ export async function addFolder(prevState: any, formdata: FormData) {
     }
 
     const name = formdata.get("name");
-    const folder = await Folder.findOne({ name: name });
+    const folder = await Folder.findOne({ name: name, userId: session.user?.id });
     if (folder) {
       return {
         status: false,
