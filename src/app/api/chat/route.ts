@@ -142,26 +142,26 @@ export async function POST(req: NextRequest, res: NextResponse) {
     ["human", "{question}"],
   ]);
 
-  console.time("Get Message History");
-  const messageHistory = await getMessageHistory(body.groupId).getMessages();
-  console.timeEnd("Get Message History");
+  // console.time("Get Message History");
+  // const messageHistory = await getMessageHistory(body.groupId).getMessages();
+  // console.timeEnd("Get Message History");
 
-  const messageHistoryString = messageHistory
-    .map((message) => `${message._getType()}: ${message.content}`)
-    .join("\n\n");
+  // const messageHistoryString = messageHistory
+  //   .map((message) => `${message._getType()}: ${message.content}`)
+  //   .join("\n\n");
 
-  const followUpQuestionCheck = ChatPromptTemplate.fromTemplate(
-    `You are an expert in checking if the question asked by a user is a follow-up question or not. Given the user question and the chat history, check if the user question is a follow-up question or not. If the user question is a follow-up question, just say "Yes". If the user question is not a follow-up question, just say "No".\n\nQuestion: {question}\n\n Chat history: {history}`,
-  );
+  // const followUpQuestionCheck = ChatPromptTemplate.fromTemplate(
+  //   `You are an expert in checking if the question asked by a user is a follow-up question or not. Given the user question and the chat history, check if the user question is a follow-up question or not. If the user question is a follow-up question, just say "Yes". If the user question is not a follow-up question, just say "No".\n\nQuestion: {question}\n\n Chat history: {history}`,
+  // );
 
-  const followUpQuestionChain = RunnableSequence.from([followUpQuestionCheck, llm, new StringOutputParser()]);
+  // const followUpQuestionChain = RunnableSequence.from([followUpQuestionCheck, llm, new StringOutputParser()]);
 
-  console.time("Follow up question chain invoke");
-  const isFollowUpQuestion = await followUpQuestionChain.invoke({
-    question: body.query,
-    history: messageHistoryString,
-  });
-  console.timeEnd("Follow up question chain invoke");
+  // console.time("Follow up question chain invoke");
+  // const isFollowUpQuestion = await followUpQuestionChain.invoke({
+  //   question: body.query,
+  //   history: messageHistoryString,
+  // });
+  // console.timeEnd("Follow up question chain invoke");
 
   const ragChainFromDocs = RunnableSequence.from([
     RunnablePassthrough.assign({
@@ -187,16 +187,16 @@ export async function POST(req: NextRequest, res: NextResponse) {
   let citations: any;
 
   console.time("Get Citations Invoke");
-  if (isFollowUpQuestion.toLowerCase() === "yes") {
-    citations = {
-      citations: [],
-    };
-  } else {
-    citations = await ragChainFromDocs.invoke({
-      context: result,
-      question: body.query,
-    });
-  }
+  // if (isFollowUpQuestion.toLowerCase() === "yes") {
+  //   citations = {
+  //     citations: [],
+  //   };
+  // } else {
+  citations = await ragChainFromDocs.invoke({
+    context: result,
+    question: body.query,
+  });
+  // }
   console.timeEnd("Get Citations Invoke");
 
   const citationIds = citations.citations.map((c: any) => c.sourceId);
