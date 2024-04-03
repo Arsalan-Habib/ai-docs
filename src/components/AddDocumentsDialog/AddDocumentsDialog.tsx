@@ -183,7 +183,7 @@ const AddDocumentsDialog = ({ open, handleClose }: { open: boolean; handleClose:
                       </p>
                       <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", justifyContent: "center" }}>
                         {filesSrc.map((file, i) => {
-                          return <Chip key={i} label={file.name} />;
+                          return <Chip key={i} label={file.name} sx={{ fontSize: "1.2rem" }} />;
                         })}
                       </div>
                     </div>
