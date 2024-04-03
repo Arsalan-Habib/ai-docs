@@ -22,7 +22,7 @@ const tools2 = [quotedAnswerTool];
 
 const llm = new ChatOpenAI({
   modelName: "gpt-3.5-turbo",
-  temperature: 0,
+  temperature: 0.2,
   streaming: true,
   cache: true,
 });
@@ -92,21 +92,17 @@ export async function POST(req: NextRequest, res: NextResponse) {
   }
 
   const retriever = vectorstore.asRetriever({
-    searchType: "mmr",
+    searchType: "similarity",
     k: 10,
-    searchKwargs: {
-      fetchK: 20,
-      lambda: 0.1,
-    },
     filter: {
-      postFilterPipeline: [
-        {
-          $match: {
-            groupId: body.groupId,
-            userId: session?.user?.id,
-          },
+      preFilter: {
+        groupId: {
+          $eq: body.groupId,
         },
-      ],
+        userId: {
+          $eq: session.user?.id,
+        },
+      },
     },
   });
 
