@@ -2,35 +2,43 @@
 
 import DeleteIcon from "@/icons/DeleteIcon";
 import EditIcon from "@/icons/EditIcon";
-import { Box, Dialog, DialogContent, IconButton, TextField } from "@mui/material";
+import {
+  Box,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  TextField,
+} from "@mui/material";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import styles from "./styles.module.css";
 
 const EditDeleteButtons = ({
-  folderId,
+  id,
   className,
-  folderName,
+  name,
+  type,
 }: {
-  folderId: string;
+  id: string;
   className?: string;
-  folderName: string;
+  name: string;
+  type: "folder" | "group";
 }) => {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
-
-  const handleClose = () => {
-    setOpen(false);
-  };
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
   async function handleDelete() {
-    const res = await fetch(`/api/folder/${folderId}`, {
+    const res = await fetch(`/api/${type}/${id}`, {
       method: "DELETE",
     });
     const data = await res.json();
 
+    setOpenDeleteModal(false);
     router.refresh();
-    console.log(data);
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -38,7 +46,7 @@ const EditDeleteButtons = ({
     const formData = new FormData(e.target as HTMLFormElement);
     const body = Object.fromEntries(formData);
 
-    const res = await fetch(`/api/folder/${folderId}`, {
+    const res = await fetch(`/api/${type}/${id}`, {
       method: "PUT",
       body: JSON.stringify(body),
       headers: {
@@ -47,21 +55,25 @@ const EditDeleteButtons = ({
     });
 
     const data = await res.json();
-    console.log("data", data);
-    handleClose();
+    setOpenEditModal(false);
     router.refresh();
   }
 
+  const dialogContent = {
+    folder: "By deleting the folder all the documents inside it will be deleted. Do you want to proceed?",
+    group: "Are you sure you want to delete this group?",
+  };
+
   return (
     <div style={{ position: "absolute", right: 0, zIndex: 2, display: "flex" }} className={className}>
-      <IconButton onClick={() => setOpen(true)}>
+      <IconButton onClick={() => setOpenEditModal(true)}>
         <EditIcon />
       </IconButton>
-      <IconButton onClick={() => handleDelete()}>
+      <IconButton onClick={() => setOpenDeleteModal(true)}>
         <DeleteIcon />
       </IconButton>
 
-      <Dialog fullWidth={true} maxWidth={"xs"} open={open} onClose={handleClose}>
+      <Dialog fullWidth={true} maxWidth={"xs"} open={openEditModal} onClose={() => setOpenEditModal(false)}>
         <DialogContent>
           <Box
             component="form"
@@ -76,13 +88,13 @@ const EditDeleteButtons = ({
               m: "auto",
             }}
           >
-            <h2>Update Folder Name</h2>
+            <h2>Update {type[0].toUpperCase() + type.substring(1)} Name</h2>
             <div style={{ width: "100%" }}>
               <TextField
-                placeholder="Folder Name"
+                placeholder={`${type[0].toUpperCase() + type.substring(1)} Name`}
                 variant="standard"
                 name="name"
-                defaultValue={folderName}
+                defaultValue={name}
                 InputProps={{
                   disableUnderline: true,
                 }}
@@ -105,6 +117,26 @@ const EditDeleteButtons = ({
               Update
             </button>
           </Box>
+        </DialogContent>
+      </Dialog>
+      <Dialog fullWidth={true} maxWidth={"xs"} open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
+        <DialogContent>
+          <DialogTitle id="alert-dialog-title" sx={{ fontSize: "2rem" }}>
+            Delete this {type}?
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description" sx={{ fontSize: "1.5rem" }}>
+              {dialogContent[type]}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <button className={styles.cancelBtn} onClick={() => setOpenDeleteModal(false)}>
+              Cancel
+            </button>
+            <button className={styles.deleteBtn} onClick={handleDelete}>
+              Delete
+            </button>
+          </DialogActions>
         </DialogContent>
       </Dialog>
     </div>

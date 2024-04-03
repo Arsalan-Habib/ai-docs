@@ -8,6 +8,8 @@ import { Blob } from "buffer";
 import { BaseMessage } from "langchain/schema";
 import { StructuredTool } from "@langchain/core/tools";
 import { z } from "zod";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { Bucket, s3 } from "./constants";
 
 const embeddings = new OpenAIEmbeddings({
   modelName: "text-embedding-3-small",
@@ -106,4 +108,16 @@ export class QuotedAnswer extends StructuredTool {
   _call(input: z.infer<(typeof this)["schema"]>): Promise<string> {
     return Promise.resolve(JSON.stringify(input, null, 2));
   }
+}
+
+export async function deleteFileFromAWS(fileKey: string) {
+  const command = new DeleteObjectCommand({
+    Bucket: Bucket,
+    Key: fileKey,
+  });
+  const response = await s3.send(command);
+
+  console.log("AWS response", response);
+
+  return response;
 }

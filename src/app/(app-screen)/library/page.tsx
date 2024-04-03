@@ -34,9 +34,10 @@ const Library = async ({ searchParams }: { searchParams?: { query?: string } }) 
                 return (
                   <div key={i} style={{ position: "relative" }} className={styles.folderContainer}>
                     <EditDeleteButtons
-                      folderId={folder._id}
+                      id={folder._id}
                       className={styles.editDeleteBtn}
-                      folderName={folder.name}
+                      name={folder.name}
+                      type="folder"
                     />
 
                     <Link

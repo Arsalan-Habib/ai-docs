@@ -1,6 +1,8 @@
 import DocGroup from "@/schemas/DocGroup";
 import Docs from "@/schemas/Docs";
 import Folder from "@/schemas/Folder";
+import MessageHistory from "@/schemas/MessageHistory";
+import { deleteFileFromAWS } from "@/utils";
 import { authOptions } from "@/utils/authOptions";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
@@ -55,7 +57,13 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
 
     const groupIds = groupsInFolder.map((group: any) => group.groupId);
 
-    await Docs.deleteMany({ groupId: { $in: groupIds }, userId: session?.user?.id });
+    const files = groupsInFolder.map((group: any) => [...group.filenames, group.mergedFilename]).flat();
+
+    await Promise.all([
+      Docs.deleteMany({ groupId: { $in: groupIds }, userId: session?.user?.id }),
+      MessageHistory.deleteMany({ sessionId: { $in: groupIds } }),
+      ...files.map((file) => deleteFileFromAWS(file)),
+    ]);
 
     return NextResponse.json({
       status: true,

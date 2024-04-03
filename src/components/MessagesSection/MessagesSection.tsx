@@ -4,6 +4,8 @@ import { ChatMessage } from "@/types";
 import React, { useEffect, useRef, useState } from "react";
 import AskQuestionForm from "../AskQuestionForm/AskQuestionForm";
 import styles from "./MessagesSection.module.css";
+import { IconButton, Typography } from "@mui/material";
+import DeleteIcon from "@/icons/DeleteIcon";
 
 const MessagesSection = ({
   params,
@@ -36,6 +38,17 @@ const MessagesSection = ({
     }
   }, [messages]);
 
+  async function deleteHistory() {
+    const response = await fetch(`/api/chat/${params.id}`, {
+      method: "DELETE",
+    });
+
+    const data = await response.json();
+
+    console.log("res", data);
+    setMessages(data.data);
+  }
+
   return (
     <div
       style={{
@@ -47,8 +60,11 @@ const MessagesSection = ({
         height: "100%",
       }}
     >
-      <div>
+      <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
         <h1>{groupTitle}</h1>
+        <IconButton style={{ background: `var(--secondary-color)` }} onClick={() => deleteHistory()}>
+          <DeleteIcon />
+        </IconButton>
       </div>
       <div
         ref={messagesContainerRef}

@@ -49,3 +49,19 @@
   width: 100% !important;
   height: 100% !important;
 }
+
+.editDeleteBtn {
+  opacity: 0;
+  top: 5px;
+  right: 5px !important;
+  border-radius: 0.8rem;
+  background: var(--secondary-color);
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.groupContainerMain:hover .editDeleteBtn {
+  opacity: 1;
+  pointer-events: all;
+  /* transition: all 0.3s ease; */
+}
