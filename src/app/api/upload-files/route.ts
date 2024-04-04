@@ -20,7 +20,7 @@ const s3 = new S3Client({
   },
 });
 
-// export const maxDuration = 300;
+export const maxDuration = 300;
 
 export async function POST(req: NextRequest) {
   await dbConnect();
