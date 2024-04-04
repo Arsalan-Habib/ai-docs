@@ -11,6 +11,8 @@ import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
+export const maxDuration = 300;
+
 const Bucket = process.env.AWS_BUCKET_NAME as string;
 const s3 = new S3Client({
   region: process.env.AWS_REGION,
@@ -19,8 +21,6 @@ const s3 = new S3Client({
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
   },
 });
-
-export const maxDuration = 300;
 
 export async function POST(req: NextRequest) {
   await dbConnect();
