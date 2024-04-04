@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { Document, Page } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -71,8 +71,11 @@ export default function PdfViewer({
         {Array.from(new Array(numPages), (el, index) => (
           <Page
             key={`page_${index + 1}`}
+            scale={1.2}
             pageNumber={index + 1}
             customTextRenderer={(textItem) => textRenderer(textItem)}
+            renderAnnotationLayer={false}
+            // renderTextLayer={false}
           />
         ))}
       </Document>
