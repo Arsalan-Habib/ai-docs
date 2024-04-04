@@ -1,5 +1,6 @@
 import DocGroup, { IDocGroup } from "@/schemas/DocGroup";
 import Folder from "@/schemas/Folder";
+import { getTruncatedTime } from "@/utils";
 import { Bucket, s3 } from "@/utils/constants";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -13,8 +14,10 @@ export const getFileUrls = cache(async (groupId: string) => {
 
   if (docGroup) {
     for (const file of docGroup.filenames) {
-      const command = new GetObjectCommand({ Bucket, Key: file });
-      const src = await getSignedUrl(s3, command, { expiresIn: 3600 });
+      const command = new GetObjectCommand({ Bucket, Key: file, ResponseCacheControl: "max-age=21600, public" });
+
+      const src = await getSignedUrl(s3, command, { expiresIn: 7 * 3600, signingDate: getTruncatedTime() });
+
       fileUrls.push(src);
     }
   }
@@ -24,8 +27,14 @@ export const getFileUrls = cache(async (groupId: string) => {
 
 export const getMergedFileUrl = cache(async (groupId: string) => {
   const docGroup = await DocGroup.findOne({ groupId });
-  const command = new GetObjectCommand({ Bucket, Key: docGroup?.mergedFilename });
-  const src = await getSignedUrl(s3, command, { expiresIn: 3600 });
+  const command = new GetObjectCommand({
+    Bucket,
+    Key: docGroup?.mergedFilename,
+    ResponseCacheControl: "max-age=21600, public",
+  });
+
+  const src = await getSignedUrl(s3, command, { expiresIn: 7 * 3600, signingDate: getTruncatedTime() });
+
   return src;
 });
 

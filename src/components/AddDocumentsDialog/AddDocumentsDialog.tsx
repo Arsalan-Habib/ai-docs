@@ -18,7 +18,7 @@ async function uploadFile(url: string, data: ArrayBuffer) {
   try {
     const res = await fetch(url, {
       method: "PUT",
-      headers: { "Content-Length": new Blob([data]).size.toString() },
+      headers: { "Content-Length": new Blob([data]).size.toString(), "Cache-control": "max-age=31536000, public" },
       body: data,
     });
 

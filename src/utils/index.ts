@@ -121,3 +121,18 @@ export async function deleteFileFromAWS(fileKey: string) {
 
   return response;
 }
+
+export const getTruncatedTime = () => {
+  const currentTime = new Date();
+  const truncatedTime = new Date(currentTime);
+
+  const hours = truncatedTime.getHours();
+  const roundedHours = Math.floor(hours / 6) * 6;
+
+  truncatedTime.setHours(roundedHours);
+  truncatedTime.setMinutes(0);
+  truncatedTime.setSeconds(0);
+  truncatedTime.setMilliseconds(0);
+
+  return truncatedTime;
+};
