@@ -1,5 +1,6 @@
 import DocGroup, { IDocGroup } from "@/schemas/DocGroup";
 import Folder from "@/schemas/Folder";
+import MessageHistory from "@/schemas/MessageHistory";
 import { getTruncatedTime } from "@/utils";
 import { Bucket, s3 } from "@/utils/constants";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
@@ -49,6 +50,20 @@ export const getGroups = cache(async ({ userId }: { userId: string }) => {
   }
 
   return groupsWithFileUrls;
+});
+
+export const getGroupsWithChatHistory = cache(async ({ userId }: { userId: string }) => {
+  const data = await getGroups({ userId });
+
+  const groupIds = data.map((item) => item.groupId);
+
+  const messageHistories = await MessageHistory.find({ sessionId: { $in: groupIds }, "messages.1": { $exists: true } });
+
+  const groupWithHistory = data.filter((item) =>
+    messageHistories.some((history) => history.sessionId === item.groupId),
+  );
+
+  return groupWithHistory;
 });
 
 export const getFolders = cache(async ({ userId }: { userId: string }) => {

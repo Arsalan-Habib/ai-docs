@@ -1,23 +1,26 @@
 "use client";
 
 import { IDocGroupWithFileUrls } from "@/schemas/DocGroup";
+import { Chip, Divider } from "@mui/material";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { Document as PDFDoc, Page } from "react-pdf";
+import Button from "../Button/Button";
 import SidebarTabs from "../SidebarTabs/SidebarTabs";
 import styles from "./Sidebar.module.css";
-import Button from "../Button/Button";
-import { signOut } from "next-auth/react";
 
 interface SidebarProps {
   groups: IDocGroupWithFileUrls[];
+  groupsWithHistory: IDocGroupWithFileUrls[];
 }
 
-const Sidebar = ({ groups }: SidebarProps) => {
+const Sidebar = ({ groups, groupsWithHistory }: SidebarProps) => {
   const params = useParams();
-  const router = useRouter();
 
   const selectedGroup = groups.filter((group) => group.groupId === params.id);
+
+  const remainingGroups = groupsWithHistory.filter((group) => group.groupId !== params.id);
 
   return (
     <div className={styles.root}>
@@ -43,6 +46,7 @@ const Sidebar = ({ groups }: SidebarProps) => {
       </Link>
       <div className={styles.mainContainer}>
         <div style={{ marginTop: "1.5rem" }}>
+          <h2 style={{ marginBottom: "1rem", fontSize: "1.6rem" }}>Active Chat(s)</h2>
           {selectedGroup.length > 0 ? (
             selectedGroup.map((group, j) => {
               return (
@@ -76,6 +80,27 @@ const Sidebar = ({ groups }: SidebarProps) => {
               Select a group from <b>library</b> to start chat
             </p>
           )}
+        </div>
+        <Divider sx={{ width: "100%", my: "2rem" }} />
+        <div>
+          <h2 style={{ marginBottom: "1rem", fontSize: "1.6rem" }}>Recent Chat(s)</h2>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
+            {remainingGroups.map((group, i) => {
+              return (
+                <Link key={i} href={`/chat/${group.groupId}`}>
+                  <Chip
+                    label={group.groupName}
+                    sx={{
+                      fontSize: "1.4rem",
+                      padding: "2rem 1rem",
+                      background: "var(--secondary-color)",
+                      cursor: "pointer",
+                    }}
+                  />
+                </Link>
+              );
+            })}
+          </div>
         </div>
       </div>
       <Button

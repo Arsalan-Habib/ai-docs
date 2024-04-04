@@ -38,9 +38,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, message: "Login to upload" });
   }
 
-  const files = formData.getAll("filename");
-
-  if (files.length === 0) {
+  if (filenames.length === 0) {
     return NextResponse.json({ success: false, message: "No files found" });
   }
 
@@ -69,11 +67,12 @@ export async function POST(req: NextRequest) {
   }));
 
   await vectorstore.addDocuments(docs);
+  const firstFilename = (filenames[0] as string).split("-", 2);
 
   if (filenames.length > 0) {
     await DocGroup.create({
       userId: session.user?.id,
-      groupName: groupName || "Untitled",
+      groupName: groupName || firstFilename[1],
       folderId: folderId || undefined,
       groupId,
       filenames,
