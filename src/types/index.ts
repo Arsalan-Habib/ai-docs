@@ -18,3 +18,11 @@ export enum AuthErrorTypes {
   CredentialsSignin = "CredentialsSignin",
   default = "default",
 }
+
+export enum UploadStages {
+  CLOUD_UPLOADING = "cloud_uploading",
+  MERGING_PDF = "merging_pdf",
+  STORE_EMBEDDINGS = "store_embeddings",
+  UPLOADING_COMPLETE = "uploading_complete",
+  // UPLOADING_TO_SERVER = "uploading_to_server",
+}
