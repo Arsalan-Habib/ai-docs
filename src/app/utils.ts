@@ -40,7 +40,9 @@ export const getMergedFileUrl = cache(async (groupId: string) => {
 });
 
 export const getGroups = cache(async ({ userId }: { userId: string }) => {
-  const data: IDocGroup[] = await DocGroup.find({ userId: userId });
+  const data: IDocGroup[] = await DocGroup.find({ userId: userId })
+    .collation({ locale: "en", strength: 2 })
+    .sort({ groupName: -1 });
 
   let groupsWithFileUrls = [];
 
@@ -67,7 +69,7 @@ export const getGroupsWithChatHistory = cache(async ({ userId }: { userId: strin
 });
 
 export const getFolders = cache(async ({ userId }: { userId: string }) => {
-  const folders = await Folder.find({ userId: userId });
+  const folders = await Folder.find({ userId: userId }).collation({ locale: "en", strength: 2 }).sort({ name: -1 });
 
   return folders;
 });
