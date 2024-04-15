@@ -6,16 +6,21 @@ import styles from "./GroupThumbnail.module.css";
 import Badge from "@mui/material/Badge";
 import EditDeleteButtons from "../EditDeleteButtons/EditDeleteButtons";
 
-const GroupThumbnail = ({ group }: { group: IDocGroupWithFileUrls }) => {
+const GroupThumbnail = ({ group, folders }: { group: IDocGroupWithFileUrls; folders: any[] }) => {
   const fileUrls = group.fileUrls.filter((_, i) => i <= 3);
 
   const remainingFiles = group.fileUrls.length - fileUrls.length;
+
+  const remainingFolders = [...folders, { _id: "undefined", name: "Root" }].filter(
+    (folder) => folder._id.toString() != group.folderId,
+  );
 
   return (
     <div style={{ position: "relative" }} className={styles.groupContainerMain}>
       <EditDeleteButtons
         id={group.groupId}
         name={group.groupName as string}
+        folders={remainingFolders}
         type={"group"}
         className={styles.editDeleteBtn}
       />

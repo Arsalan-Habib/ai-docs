@@ -5,6 +5,87 @@ import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 import styles from "./PDFViewer.module.css";
 
+import invariant from "tiny-invariant";
+import { usePageContext } from "react-pdf";
+
+import type { RenderParameters } from "pdfjs-dist/types/src/display/api.js";
+
+function CustomRenderer({ transform }: { transform?: number[][] }) {
+  console.log(transform);
+
+  // const t = transform![0];
+
+  const pageContext = usePageContext();
+
+  invariant(pageContext, "Unable to find Page context.");
+
+  const { _className, page, rotate, scale } = pageContext;
+
+  invariant(page, "Attempted to render page canvas, but no page was specified.");
+
+  const imageElement = useRef<HTMLImageElement>(null);
+
+  const viewport = useMemo(() => page.getViewport({ scale, rotation: rotate }), [page, rotate, scale]);
+
+  function drawPageOnImage() {
+    if (!page) {
+      return;
+    }
+
+    const { current: image } = imageElement;
+
+    if (!image) {
+      return;
+    }
+
+    const canvas = document.createElement("canvas");
+    const canvas2 = document.createElement("canvas");
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    canvas2.width = viewport.width;
+    canvas2.height = viewport.height;
+
+    const ctx = canvas.getContext("2d", { alpha: false }) as CanvasRenderingContext2D;
+    const ctx2 = canvas2.getContext("2d", { alpha: false }) as CanvasRenderingContext2D;
+
+    ctx.transform(1, 0.5, -0.5, 1, 30, 10);
+    ctx.fillStyle = "red";
+    ctx.fillRect(0, 0, 250, 100);
+
+    // ctx.translate(-viewport.width / 2, -viewport.height / 2);
+
+    // console.log(t);
+
+    ctx2.drawImage(canvas, 0, 0);
+
+    const renderContext: RenderParameters = {
+      canvasContext: ctx2,
+      viewport,
+      // pageColors:
+      // intent: "display",
+    };
+
+    const cancellable = page.render(renderContext);
+    const runningTask = cancellable;
+
+    cancellable.promise
+      .then(() => {
+        image.src = canvas2.toDataURL();
+      })
+      .catch(() => {
+        // Intentionally empty
+      });
+
+    return () => {
+      runningTask.cancel();
+    };
+  }
+
+  useEffect(drawPageOnImage, [imageElement, page, viewport]);
+
+  return <img className={`${_className}__image`} height={viewport.height} ref={imageElement} width={viewport.width} />;
+}
+
 function highlightPattern(text: any, pattern: string) {
   const lines = pattern.split(/(\s*\n\s*|\s*\n\s*\n|\s*\n\n\s*)/);
 
@@ -29,10 +110,12 @@ export default function PdfViewer({
   searchQuery,
 }: {
   url: string;
-  searchQuery?: { content: string; pageNumber: number };
+  searchQuery?: { content: string; pageNumber: number; transforms?: number[][] };
 }) {
   const [numPages, setNumPages] = useState<number | null>(null);
   const docRef = useRef<HTMLDivElement | null>(null);
+
+  console.log("searchQuery", searchQuery);
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages);
@@ -52,8 +135,6 @@ export default function PdfViewer({
       const _document = document.querySelector("#pdf-docs-pages");
       const pageEl = document.querySelector(`[data-page-number="${searchQuery.pageNumber}"]`);
 
-      console.log("pageEl", pageEl);
-
       if (pageEl && _document) {
         _document.scrollTo({ top: pageEl.getBoundingClientRect().top - 100, behavior: "smooth" });
       }
@@ -72,10 +153,12 @@ export default function PdfViewer({
           <Page
             key={`page_${index + 1}`}
             scale={1.2}
+            // renderMode="custom"
+            customRenderer={() => <CustomRenderer transform={searchQuery?.transforms} />}
             pageNumber={index + 1}
             customTextRenderer={(textItem) => textRenderer(textItem)}
             renderAnnotationLayer={false}
-            // renderTextLayer={false}
+            renderTextLayer={true}
           />
         ))}
       </Document>

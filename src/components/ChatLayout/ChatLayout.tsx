@@ -17,6 +17,7 @@ const ChatLayout = ({
     | {
         content: string;
         pageNumber: number;
+        transforms?: number[][];
       }
     | undefined
   >(undefined);

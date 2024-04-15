@@ -1,4 +1,4 @@
-import { getGroups } from "@/app/utils";
+import { getFolders, getGroups } from "@/app/utils";
 import AddDocuments from "@/components/AddDocuments/AddDocuments";
 import GroupThumbnail from "@/components/GroupThumbnail/GroupThumbnail";
 import { authOptions } from "@/utils/authOptions";
@@ -14,7 +14,10 @@ const Folder = async ({
 }) => {
   const session = await getServerSession(authOptions);
 
-  const groups = await getGroups({ userId: session?.user?.id as string });
+  const groupsData = getGroups({ userId: session?.user?.id as string });
+  const foldersData = getFolders({ userId: session?.user?.id as string });
+
+  const [groups, folders] = await Promise.all([groupsData, foldersData]);
 
   const folderGroups = groups
     .filter((group) => group.folderId === params.folderId)
@@ -24,7 +27,7 @@ const Folder = async ({
     <div className={styles.root}>
       {folderGroups.length > 0 &&
         folderGroups.map((group, i) => {
-          return <GroupThumbnail group={group} key={i} />;
+          return <GroupThumbnail group={group} key={i} folders={folders} />;
         })}
       <AddDocuments />
     </div>

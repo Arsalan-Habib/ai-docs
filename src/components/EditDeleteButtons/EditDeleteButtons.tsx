@@ -9,27 +9,37 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Divider,
   IconButton,
+  Menu,
+  MenuItem,
+  Select,
   TextField,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import styles from "./styles.module.css";
+import MoveToIcon from "@/icons/MoveToIcon";
+import { moveGroupToFolder } from "@/actions/moveGroupToFolder";
 
 const EditDeleteButtons = ({
   id,
   className,
   name,
+  folders,
   type,
 }: {
   id: string;
   className?: string;
   name: string;
+  folders?: any[];
   type: "folder" | "group";
 }) => {
   const router = useRouter();
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [openMoveToModal, setOpenMoveToModal] = useState(false);
+  const [selectedFolder, setSelectedFolder] = useState<string>("null");
 
   async function handleDelete() {
     const res = await fetch(`/api/${type}/${id}`, {
@@ -59,6 +69,12 @@ const EditDeleteButtons = ({
     router.refresh();
   }
 
+  const handleMoveTo = async () => {
+    await moveGroupToFolder(id, selectedFolder);
+
+    setOpenMoveToModal(false);
+  };
+
   const dialogContent = {
     folder: "By deleting the folder all the documents inside it will be deleted. Do you want to proceed?",
     group: "Are you sure you want to delete this group?",
@@ -69,6 +85,69 @@ const EditDeleteButtons = ({
       <IconButton onClick={() => setOpenEditModal(true)}>
         <EditIcon />
       </IconButton>
+      {type === "group" && !!folders && folders.length > 0 && (
+        <>
+          <IconButton onClick={() => setOpenMoveToModal(true)}>
+            <MoveToIcon />
+          </IconButton>
+          <Dialog fullWidth={true} maxWidth={"xs"} open={openMoveToModal} onClose={() => setOpenMoveToModal(false)}>
+            <DialogContent>
+              <Box
+                component="form"
+                // onSubmit={handleSubmit}
+                action={() => handleMoveTo()}
+                sx={{
+                  width: "100%",
+                  padding: "4rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1rem",
+                  alignItems: "center",
+                  m: "auto",
+                }}
+              >
+                <h2>Move To Folder</h2>
+                <div style={{ width: "100%" }}>
+                  <Select
+                    sx={{ width: "100%", fontSize: "1.4rem" }}
+                    id="demo-simple-select"
+                    value={selectedFolder}
+                    native={false}
+                    defaultValue=""
+                    renderValue={(selected) => {
+                      console.log("selected", selected);
+
+                      if (selected === "null") {
+                        return <em>Select Folder</em>;
+                      }
+
+                      const foldername = folders.find((folder) => folder._id === selected)?.name || "";
+
+                      return foldername;
+                    }}
+                    // label="Select Folder"
+                    onChange={(e) => setSelectedFolder(e.target.value)}
+                  >
+                    <MenuItem value={"null"} disabled sx={{ fontSize: "1.4rem" }}>
+                      Select Folder
+                    </MenuItem>
+
+                    {folders.map((folder) => (
+                      <MenuItem key={folder._id} value={folder._id} sx={{ fontSize: "1.4rem" }}>
+                        {folder.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </div>
+
+                <button className={styles.updateBtn} type="submit">
+                  Move
+                </button>
+              </Box>
+            </DialogContent>
+          </Dialog>
+        </>
+      )}
       <IconButton onClick={() => setOpenDeleteModal(true)}>
         <DeleteIcon />
       </IconButton>

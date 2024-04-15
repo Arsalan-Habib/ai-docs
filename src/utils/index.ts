@@ -1,5 +1,5 @@
 import { Document } from "langchain/document";
-import { WebPDFLoader } from "langchain/document_loaders/web/pdf";
+// import { WebPDFLoader } from "langchain/document_loaders/web/pdf";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { MongoDBAtlasVectorSearch, MongoDBChatMessageHistory } from "@langchain/mongodb";
@@ -10,6 +10,7 @@ import { StructuredTool } from "@langchain/core/tools";
 import { z } from "zod";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { Bucket, s3 } from "./constants";
+import { WebPDFLoader } from "./customPdfLoader";
 
 const embeddings = new OpenAIEmbeddings({
   modelName: "text-embedding-3-small",
@@ -99,6 +100,7 @@ export class QuotedAnswer extends StructuredTool {
   schema = z.object({
     answer: z.string().describe("The answer to the user question, which is based only on the given sources."),
     citations: z.array(citationSchema).optional().describe("Citations from the given sources that justify the answer."),
+    // transform:
   });
 
   constructor() {

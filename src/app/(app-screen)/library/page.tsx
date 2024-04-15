@@ -58,7 +58,7 @@ const Library = async ({ searchParams }: { searchParams?: { query?: string } }) 
           <>
             {groupsWithNoFolder.length > 0 &&
               groupsWithNoFolder.map((group, i) => {
-                return <GroupThumbnail group={group} key={i} />;
+                return <GroupThumbnail group={group} key={i} folders={folders} />;
               })}
           </>
 
