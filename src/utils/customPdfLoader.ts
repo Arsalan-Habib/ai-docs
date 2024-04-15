@@ -1,5 +1,5 @@
 import { Document } from "@langchain/core/documents";
-import { DocumentLoader } from "langchain/dist/document_loaders/base";
+import { DocumentLoader } from "langchain/document_loaders/base";
 import { TextSplitter } from "langchain/text_splitter";
 import { formatDocumentsAsString } from "langchain/util/document";
 
@@ -127,6 +127,7 @@ export class WebPDFLoader extends BaseDocumentLoader {
 
 async function PDFLoaderImports() {
   try {
+    // @ts-ignore
     const { default: mod } = await import("pdf-parse/lib/pdf.js/v1.10.100/build/pdf.js");
     const { getDocument, version } = mod;
     return { getDocument, version };

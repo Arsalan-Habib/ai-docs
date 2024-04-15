@@ -19,6 +19,7 @@ const getMessageHistory = (sessionId: string, docs?: Document[]) =>
     sources: docs,
   });
 
+// @ts-ignore
 const quotedAnswerTool = formatToOpenAITool(new QuotedAnswer());
 const tools2 = [quotedAnswerTool];
 
@@ -161,6 +162,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
   // });
   // console.timeEnd("Follow up question chain invoke");
 
+  // @ts-ignore
   const ragChainFromDocs = RunnableSequence.from([
     RunnablePassthrough.assign({
       context: (input: any) => convertDocsToString(input.context),
@@ -171,6 +173,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     outputParser,
   ]);
 
+  // @ts-ignore
   const ragChainAnswer = RunnableSequence.from([
     {
       context: (input: any) => convertDocsToString(input.context),
@@ -204,6 +207,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
   const chainWithHistory = new RunnableWithMessageHistory({
     runnable: ragChainAnswer,
 
+    // @ts-ignore
     getMessageHistory: (sessionId) => getMessageHistory(sessionId, docs),
 
     inputMessagesKey: "question",

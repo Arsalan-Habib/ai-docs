@@ -72,6 +72,8 @@ export class ExtendedMongoDBChatHistory extends MongoDBChatMessageHistory {
 
     this.sources = sources;
   }
+
+  // @ts-ignore
   async addMessage(message: BaseMessage) {
     if (message._getType() === "ai") {
       message.additional_kwargs = {
@@ -79,6 +81,7 @@ export class ExtendedMongoDBChatHistory extends MongoDBChatMessageHistory {
       };
     }
 
+    // @ts-ignore
     await super.addMessage(message);
   }
 }
