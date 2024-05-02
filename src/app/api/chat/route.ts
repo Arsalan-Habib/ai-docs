@@ -30,7 +30,7 @@ const llm = new ChatOpenAI({
   cache: true,
 });
 
-const namespace = "data-bot.historymessages";
+const namespace = "doc-abstract.historymessages";
 const [dbName, collectionName] = namespace.split(".");
 
 const collection = client.db(dbName).collection(collectionName);

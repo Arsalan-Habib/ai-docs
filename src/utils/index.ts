@@ -18,7 +18,7 @@ const embeddings = new OpenAIEmbeddings({
 });
 
 export const client = new MongoClient(process.env.MONGODB_URI || "");
-const namespace = "data-bot.docs";
+const namespace = "doc-abstract.docs";
 
 const [dbName, collectionName] = namespace.split(".");
 
