@@ -65,7 +65,7 @@ function CustomRenderer({ transform }: { transform?: number[][] }) {
       // intent: "display",
     };
 
-    const cancellable = page.render(renderContext);
+    const cancellable = page.render(renderContext as any);
     const runningTask = cancellable;
 
     cancellable.promise
