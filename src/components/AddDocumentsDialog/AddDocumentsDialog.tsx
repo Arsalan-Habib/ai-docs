@@ -16,6 +16,8 @@ import styles from "./AddDocumentsDialog.module.css";
 import { UploadStages } from "@/types";
 import InfoIcon from "@/icons/InfoIcon";
 import CheckIcon from "@/icons/CheckIcon";
+import { pdfjs } from "react-pdf";
+import { client } from "@/utils";
 
 async function uploadFile(url: string, data: ArrayBuffer) {
   try {
@@ -86,6 +88,7 @@ const AddDocumentsDialog = ({ open, handleClose }: { open: boolean; handleClose:
         // formdata.append("file", acceptedFiles[i]);
         formdata.append("filename", filename);
         const clientUrl = await createPresignedUrl({ key: filename });
+        const file = await acceptedFiles[i].arrayBuffer();
 
         setPresignedUrls((prevUrls) => [...prevUrls, clientUrl]);
       }

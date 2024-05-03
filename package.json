@@ -28,6 +28,7 @@
     "next-auth": "^4.24.6",
     "pdf-merger-js": "^5.1.1",
     "pdf-parse": "^1.1.1",
+    "pdfjs-dist": "^4.2.67",
     "prettier": "^3.2.5",
     "react": "^18",
     "react-dom": "^18",

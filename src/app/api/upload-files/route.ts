@@ -50,11 +50,23 @@ export async function POST(req: NextRequest) {
   const response = await fetch(src);
   const mergedPdfBuffer = await response.arrayBuffer();
 
-  const file = new Blob([mergedPdfBuffer], { type: "application/pdf" });
-
   const splitDocs: Document[] = await loadAndSplitChunks({
-    fileUrl: file as any,
+    fileUrl: mergedPdfBuffer,
   });
+
+  // return NextResponse.json({
+  //   message: "Checking",
+  // });
+
+  // pdfjs.getDocument(mergedPdfBuffer).promise.then((data) => {
+  //   for (let i = 0; i < data.numPages; i++) {
+  //     data.getPage(i + 1).then((page) => {
+  //       page.getTextContent().then((text) => {
+  //         console.log(`page ${i + 1}`, text);
+  //       });
+  //     });
+  //   }
+  // });
 
   const docs = splitDocs.map((doc) => ({
     pageContent: doc.pageContent,

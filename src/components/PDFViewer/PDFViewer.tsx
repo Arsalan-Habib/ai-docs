@@ -154,14 +154,23 @@ export default function PdfViewer({
             key={`page_${index + 1}`}
             scale={1.2}
             // renderMode="custom"
-            customRenderer={() => <CustomRenderer transform={searchQuery?.transforms} />}
+            // customRenderer={() => <CustomRenderer transform={searchQuery?.transforms} />}
             pageNumber={index + 1}
             customTextRenderer={(textItem) => textRenderer(textItem)}
-            renderAnnotationLayer={false}
-            renderTextLayer={true}
+            // renderAnnotationLayer={false}
+            // renderTextLayer={true}
           />
         ))}
       </Document>
     </div>
   );
 }
+
+/*
+1). First we have to loop through each page of a pdf and detect if it's scanned or not, for which I have to do some research as to how it's done.
+2). For scanned pages we will have to create a url for the image or extract the image buffer data, on which 
+3). Google's OCR will be applied to each page that is scanned (i.e. in the form of image)
+4). For the scanned pages we will have to manually create something called "Documents" (i.e a chunk of a page content with proper metadata) that we later use to create embeddings.
+5). 
+
+*/

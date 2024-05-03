@@ -11,6 +11,8 @@ import { z } from "zod";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { Bucket, s3 } from "./constants";
 import { WebPDFLoader } from "./customPdfLoader";
+import { UnstructuredLoader } from "./customUnstructuredLoader";
+// import { UnstructuredLoader } from "langchain/document_loaders/fs/unstructured";
 
 const embeddings = new OpenAIEmbeddings({
   modelName: "text-embedding-3-small",
@@ -44,10 +46,17 @@ export const loadAndSplitChunks = async ({
 }: {
   chunkSize?: number;
   chunkOverlap?: number;
-  fileUrl: Blob;
+  fileUrl: ArrayBuffer;
 }) => {
-  const loader = new WebPDFLoader(fileUrl as any);
+  // const loader = new WebPDFLoader(fileUrl as any);
+  const loader = new UnstructuredLoader(fileUrl as unknown as string, {
+    ocrLanguages: ["en"],
+    apiKey: process.env.UNSTRUCTURED_API_KEY,
+    apiUrl: "https://api.unstructured.io/general/v0/general",
+  });
+
   const rawDoc = await loader.load();
+  console.log("loader =>", rawDoc);
 
   const splitter = new RecursiveCharacterTextSplitter({
     chunkOverlap,
