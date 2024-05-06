@@ -112,7 +112,7 @@ const MessagesSection = ({
                           }}
                         >
                           <pre>
-                            <code>P#{source.metadata.loc.pageNumber}</code>
+                            <code>P#{source.metadata.loc.pageNumber ?? source.metadata.page_number}</code>
                           </pre>
                         </p>
                       ))}
