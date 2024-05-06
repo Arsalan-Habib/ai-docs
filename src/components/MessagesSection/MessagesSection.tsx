@@ -94,7 +94,7 @@ const MessagesSection = ({
                           onClick={() =>
                             setSearchQuery({
                               content: source.pageContent,
-                              pageNumber: source.metadata.loc.pageNumber,
+                              pageNumber: source.metadata.loc.pageNumber ?? source.metadata.page_number,
                               transforms: source.metadata.loc.transforms,
                             })
                           }
