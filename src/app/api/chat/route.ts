@@ -27,7 +27,7 @@ const llm = new ChatOpenAI({
   modelName: "gpt-3.5-turbo",
   temperature: 0.2,
   streaming: true,
-  cache: true,
+  cache: false,
 });
 
 const namespace = "doc-abstract.historymessages";
@@ -136,7 +136,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
   const citationPrompt = ChatPromptTemplate.fromMessages([
     [
       "system",
-      "You're a helpful AI assistant. Given a user question and some sources, cite the sources related to that question. If none of the sources relates to the question, DO NOT cite anything.\n\nHere are the sources:{context}",
+      "You're a helpful AI assistant. Given a user question and some sources, cite the sources related to that question. If none of the sources relates to the question, DO NOT cite anything. If a source does not have enough context to answer the question, DO NOT cite it.\n\nHere are the sources:{context}",
     ],
     ["human", "{question}"],
   ]);
@@ -202,7 +202,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
   const citationIds = citations.citations.map((c: any) => c.sourceId);
 
-  const docs = result.filter((_, i) => citationIds.includes(i + 1));
+  let docs: any = result.filter((doc, i) => citationIds.includes(doc.metadata.page_number));
+
+  if (docs.length === 0) {
+    docs = result.filter((_, i) => citationIds.includes(i + 1));
+  }
 
   const chainWithHistory = new RunnableWithMessageHistory({
     runnable: ragChainAnswer,
