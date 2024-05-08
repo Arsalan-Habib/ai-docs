@@ -173,7 +173,7 @@ const AddDocumentsDialog = ({ open, handleClose }: { open: boolean; handleClose:
   return (
     <Dialog fullWidth={true} maxWidth={"sm"} open={open} onClose={() => (loading ? null : handleClose())}>
       <DialogContent>
-        {!loading && (
+        {!true && (
           <Box
             component="form"
             onSubmit={handleSubmit}
@@ -238,9 +238,12 @@ const AddDocumentsDialog = ({ open, handleClose }: { open: boolean; handleClose:
             <UploadButton canUpload={filesSrc.length > 0} loading={loading} />
           </Box>
         )}
-        {loading && (
+        {true && (
           <Box sx={{ padding: "4rem" }}>
-            <h1>Document(s) Uploading In Progress</h1>
+            <h1>Document(s) uploading in progress</h1>
+            <p style={{ fontSize: "1.5rem", marginTop: "0.4rem", color: "#747474" }}>
+              This might take a few minutes. Please do not close this dialog
+            </p>
             <div className={styles.progressContainer}>
               <div className={styles.progress}>
                 <ProgressIndicator
