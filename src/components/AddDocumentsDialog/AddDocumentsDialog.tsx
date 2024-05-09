@@ -190,7 +190,7 @@ const AddDocumentsDialog = ({ open, handleClose }: { open: boolean; handleClose:
             <h1>Upload Documents</h1>
             <div style={{ width: "100%" }}>
               <TextField
-                placeholder="Your Documents Group Name"
+                placeholder="Document Name"
                 variant="standard"
                 name="groupName"
                 value={groupName}

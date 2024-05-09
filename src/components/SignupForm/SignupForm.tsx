@@ -95,12 +95,6 @@ const SignupForm = () => {
             name="lastName"
             inputProps={{ style: { fontSize: "1.4rem" } }}
           />
-          <TextField
-            placeholder="Username"
-            name="userName"
-            sx={{ width: "100%" }}
-            inputProps={{ style: { fontSize: "1.4rem" } }}
-          />
           <Box>
             <TextField
               placeholder="Email"

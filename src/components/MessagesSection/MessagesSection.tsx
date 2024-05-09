@@ -47,7 +47,6 @@ const MessagesSection = ({
 
     const data = await response.json();
 
-    console.log("res", data);
     setMessages(data.data);
   }
 
@@ -77,6 +76,14 @@ const MessagesSection = ({
         }}
       >
         {messages.map((message, i) => {
+          const uniquePageNumbers =
+            message.data.additional_kwargs &&
+            message.data.additional_kwargs.sources &&
+            message.data.additional_kwargs.sources.length > 0 &&
+            message.data.additional_kwargs?.sources
+              .map((source: any) => source.metadata.page_number)
+              .filter((value: any, index: number, current_value: any) => current_value.indexOf(value) === index);
+
           return (
             <div
               key={i}
@@ -89,13 +96,13 @@ const MessagesSection = ({
                   <div style={{ marginTop: "0.5rem" }}>
                     <h5>Sources:</h5>
                     <div style={{ display: "flex", gap: "0.2rem", marginTop: "0.2rem", flexWrap: "wrap" }}>
-                      {message.data.additional_kwargs.sources.map((source: any, i: number) => (
+                      {uniquePageNumbers.map((source: any, i: number) => (
                         <p
                           onClick={() =>
                             setSearchQuery({
-                              content: source.pageContent,
-                              pageNumber: source.metadata.loc.pageNumber ?? source.metadata.page_number,
-                              transforms: source.metadata.loc.transforms,
+                              content: message.data.additional_kwargs?.sources[0].pageContent,
+                              pageNumber: source,
+                              transforms: [[1, 2]],
                             })
                           }
                           key={i}
@@ -112,7 +119,7 @@ const MessagesSection = ({
                           }}
                         >
                           <pre>
-                            <code>P#{source.metadata.loc.pageNumber ?? source.metadata.page_number}</code>
+                            <code>P#{source}</code>
                           </pre>
                         </p>
                       ))}

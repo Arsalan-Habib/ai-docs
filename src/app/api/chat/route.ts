@@ -126,7 +126,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
   const prompt = ChatPromptTemplate.fromMessages([
     [
       "system",
-      `You're a helpful AI assistant. Given a user question and some PDF document chunks, answer the user question. If none of the document chunks answer the question, just say you don't know.\n\nHere are the PDF document chunks:{context}
+      `You're a helpful AI assistant. Given a user question and some PDF document chunks, answer the user question. If none of the document chunks answer the question, just say you do not see that in the document.\n\nHere are the PDF document chunks:{context}
       `,
     ],
     new MessagesPlaceholder("history"),
