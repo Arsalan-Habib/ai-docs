@@ -77,7 +77,7 @@ const AddDocumentsDialog = ({
 }: {
   open: boolean;
   handleClose: () => void;
-  setIsError: Dispatch<SetStateAction<boolean>>;
+  setIsError?: Dispatch<SetStateAction<boolean>>;
 }) => {
   const [filesSrc, setFilesSrc] = useState<File[]>([]);
   const params = useParams();
@@ -87,6 +87,8 @@ const AddDocumentsDialog = ({
   const router = useRouter();
   const [groupName, setGroupName] = useState("");
   const formdata = useMemo(() => new FormData(), []);
+
+  // console.log("setIsError", setIsError);
 
   const onDrop = useCallback(
     async (acceptedFiles: any[]) => {
@@ -177,7 +179,9 @@ const AddDocumentsDialog = ({
     } catch (error) {
       console.log("error", error);
 
-      setIsError(true);
+      if (setIsError) {
+        setIsError(true);
+      }
       handleClose();
     }
   }

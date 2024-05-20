@@ -62,7 +62,9 @@ const Library = async ({ searchParams }: { searchParams?: { query?: string } }) 
                 return <GroupThumbnail group={group} key={i} folders={folders} />;
               })}
           </>
-          <DialogContainer />
+          <DialogContainer>
+            <AddNew />
+          </DialogContainer>
         </div>
       </div>
     </div>

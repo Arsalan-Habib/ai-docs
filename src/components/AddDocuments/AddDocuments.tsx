@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import styles from "./AddDocuments.module.css";
 import AddDocumentsDialog from "../AddDocumentsDialog/AddDocumentsDialog";
+import DialogContainer from "../DialogContainer/DialogContainer";
 
 const AddDocuments = () => {
   const [open, setOpen] = useState(false);
@@ -16,7 +17,9 @@ const AddDocuments = () => {
         <h3>Upload Documents</h3>
       </div>
 
-      <AddDocumentsDialog open={open} handleClose={() => setOpen(false)} />
+      <DialogContainer>
+        <AddDocumentsDialog open={open} handleClose={() => setOpen(false)} />
+      </DialogContainer>
     </div>
   );
 };

@@ -4,7 +4,7 @@ import { Alert, Snackbar } from "@mui/material";
 import React, { useState } from "react";
 import AddNew from "../AddNew/AddNew";
 
-const DialogContainer = () => {
+const DialogContainer = ({ children }: { children: React.ReactNode }) => {
   const [isError, setIsError] = useState(false);
 
   const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
@@ -15,6 +15,14 @@ const DialogContainer = () => {
     setIsError(false);
   };
 
+  const childrenWithProps = React.Children.map(children, (child) => {
+    if (React.isValidElement(child)) {
+      return React.cloneElement(child, { setIsError } as React.HTMLAttributes<HTMLElement>);
+    }
+
+    return child;
+  }) as React.ReactElement[];
+
   return (
     <>
       <Snackbar open={isError} onClose={handleClose}>
@@ -23,7 +31,7 @@ const DialogContainer = () => {
         </Alert>
       </Snackbar>
 
-      <AddNew setIsError={setIsError} />
+      {childrenWithProps}
     </>
   );
 };

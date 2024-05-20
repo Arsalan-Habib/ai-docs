@@ -9,12 +9,15 @@ import AddDocumentsDialog from "../AddDocumentsDialog/AddDocumentsDialog";
 import AddFolderDialog from "../AddFolderDialog/AddFolderDialog";
 import styles from "./AddNew.module.css";
 
-const AddNew = ({ setIsError }: { setIsError: Dispatch<SetStateAction<boolean>> }) => {
+const AddNew = ({ setIsError }: { setIsError?: Dispatch<SetStateAction<boolean>> }) => {
   const [open, setOpen] = useState(false);
   const [openFolderModal, setOpenFolderModal] = useState(false);
   const [openDocumentsModal, setDocumentsModal] = useState(false);
   const [formId, setFormId] = useState(() => crypto.randomUUID());
   const [formId2, setFormId2] = useState(() => crypto.randomUUID());
+
+  console.log("setIsError", setIsError);
+
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -87,7 +90,7 @@ const AddNew = ({ setIsError }: { setIsError: Dispatch<SetStateAction<boolean>> 
         key={formId2}
         open={openDocumentsModal}
         handleClose={() => setDocumentsModal(false)}
-        setIsError={setIsError}
+        setIsError={setIsError || (() => {})}
       />
     </div>
   );
