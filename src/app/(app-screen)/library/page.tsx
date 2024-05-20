@@ -7,6 +7,7 @@ import { getServerSession } from "next-auth";
 import Link from "next/link";
 import styles from "./library.module.css";
 import EditDeleteButtons from "@/components/EditDeleteButtons/EditDeleteButtons";
+import DialogContainer from "@/components/DialogContainer/DialogContainer";
 
 const Library = async ({ searchParams }: { searchParams?: { query?: string } }) => {
   const session = await getServerSession(authOptions);
@@ -61,8 +62,7 @@ const Library = async ({ searchParams }: { searchParams?: { query?: string } }) 
                 return <GroupThumbnail group={group} key={i} folders={folders} />;
               })}
           </>
-
-          <AddNew />
+          <DialogContainer />
         </div>
       </div>
     </div>

@@ -4,12 +4,12 @@ import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import AddDocumentsDialog from "../AddDocumentsDialog/AddDocumentsDialog";
 import AddFolderDialog from "../AddFolderDialog/AddFolderDialog";
 import styles from "./AddNew.module.css";
 
-const AddNew = () => {
+const AddNew = ({ setIsError }: { setIsError: Dispatch<SetStateAction<boolean>> }) => {
   const [open, setOpen] = useState(false);
   const [openFolderModal, setOpenFolderModal] = useState(false);
   const [openDocumentsModal, setDocumentsModal] = useState(false);
@@ -83,7 +83,12 @@ const AddNew = () => {
         }}
       />
 
-      <AddDocumentsDialog key={formId2} open={openDocumentsModal} handleClose={() => setDocumentsModal(false)} />
+      <AddDocumentsDialog
+        key={formId2}
+        open={openDocumentsModal}
+        handleClose={() => setDocumentsModal(false)}
+        setIsError={setIsError}
+      />
     </div>
   );
 };

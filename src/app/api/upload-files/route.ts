@@ -23,82 +23,87 @@ const s3 = new S3Client({
 });
 
 export async function POST(req: NextRequest) {
-  await dbConnect();
+  try {
+    await dbConnect();
 
-  const formData = await req.formData();
+    const formData = await req.formData();
 
-  const folderId = formData.get("folderId");
-  const groupName = formData.get("groupName");
-  const filenames = formData.getAll("filename");
-  const mergedFilename = formData.get("mergedFilename");
+    const folderId = formData.get("folderId");
+    const groupName = formData.get("groupName");
+    const filenames = formData.getAll("filename");
+    const mergedFilename = formData.get("mergedFilename");
 
-  const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions);
 
-  if (!session) {
-    return NextResponse.json({ success: false, message: "Login to upload" });
-  }
+    if (!session) {
+      return NextResponse.json({ success: false, message: "Login to upload" });
+    }
 
-  if (filenames.length === 0) {
-    return NextResponse.json({ success: false, message: "No files found" });
-  }
+    if (filenames.length === 0) {
+      return NextResponse.json({ success: false, message: "No files found" });
+    }
 
-  const groupId = randomBytes(8).toString("hex");
+    const groupId = randomBytes(8).toString("hex");
 
-  const command = new GetObjectCommand({ Bucket, Key: mergedFilename as string });
-  const src = await getSignedUrl(s3, command, { expiresIn: 3600 });
+    const command = new GetObjectCommand({ Bucket, Key: mergedFilename as string });
+    const src = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
-  const response = await fetch(src);
-  const mergedPdfBuffer = await response.arrayBuffer();
+    const response = await fetch(src);
+    const mergedPdfBuffer = await response.arrayBuffer();
 
-  const splitDocs: Document[] = await loadAndSplitChunks({
-    fileUrl: mergedPdfBuffer,
-  });
-
-  // return NextResponse.json({
-  //   message: "Checking",
-  // });
-
-  // pdfjs.getDocument(mergedPdfBuffer).promise.then((data) => {
-  //   for (let i = 0; i < data.numPages; i++) {
-  //     data.getPage(i + 1).then((page) => {
-  //       page.getTextContent().then((text) => {
-  //         console.log(`page ${i + 1}`, text);
-  //       });
-  //     });
-  //   }
-  // });
-
-  const docs = splitDocs.map((doc) => ({
-    pageContent: doc.pageContent,
-    metadata: {
-      ...doc.metadata,
-      filename: mergedFilename,
-      userId: session.user?.id,
-      groupId: groupId,
-    },
-  }));
-
-  await vectorstore.addDocuments(docs);
-  const firstFilename = (filenames[0] as string).split("-", 2);
-
-  if (filenames.length > 0) {
-    await DocGroup.create({
-      userId: session.user?.id,
-      groupName: groupName || firstFilename[1],
-      folderId: folderId || undefined,
-      groupId,
-      filenames,
-      mergedFilename: mergedFilename,
+    const splitDocs: Document[] = await loadAndSplitChunks({
+      fileUrl: mergedPdfBuffer,
     });
+
+    // return NextResponse.json({
+    //   message: "Checking",
+    // });
+
+    // pdfjs.getDocument(mergedPdfBuffer).promise.then((data) => {
+    //   for (let i = 0; i < data.numPages; i++) {
+    //     data.getPage(i + 1).then((page) => {
+    //       page.getTextContent().then((text) => {
+    //         console.log(`page ${i + 1}`, text);
+    //       });
+    //     });
+    //   }
+    // });
+
+    const docs = splitDocs.map((doc) => ({
+      pageContent: doc.pageContent,
+      metadata: {
+        ...doc.metadata,
+        filename: mergedFilename,
+        userId: session.user?.id,
+        groupId: groupId,
+      },
+    }));
+
+    await vectorstore.addDocuments(docs);
+    const firstFilename = (filenames[0] as string).split("-", 2);
+
+    if (filenames.length > 0) {
+      await DocGroup.create({
+        userId: session.user?.id,
+        groupName: groupName || firstFilename[1],
+        folderId: folderId || undefined,
+        groupId,
+        filenames,
+        mergedFilename: mergedFilename,
+      });
+    }
+
+    revalidatePath("/library");
+
+    return NextResponse.json({
+      success: true,
+      message: "Uploaded Successfully",
+      data: {
+        groupId: groupId,
+      },
+    });
+  } catch (error: any) {
+    console.log("error", error);
+    throw new Error(error);
   }
-
-  revalidatePath("/library");
-
-  return NextResponse.json({
-    success: true,
-    message: "Uploaded Successfully",
-    data: {
-      groupId: groupId,
-    },
-  });
 }

@@ -6,6 +6,7 @@ import { StringWithAutocomplete } from "@langchain/core/utils/types";
 import { UnknownHandling } from "langchain/document_loaders/fs/unstructured";
 import { DirectoryLoader, LoadersMapping } from "langchain/document_loaders/fs/directory";
 import { BaseDocumentLoader } from "langchain/document_loaders/base";
+import axios from "axios";
 // import {
 //   DirectoryLoader,
 //   UnknownHandling,
@@ -249,19 +250,17 @@ export class UnstructuredLoader extends BaseDocumentLoader {
       "UNSTRUCTURED-API-KEY": this.apiKey ?? "",
     };
 
-    const response = await fetch(this.apiUrl, {
-      method: "POST",
-      body: formData,
+    const response = await axios.post(this.apiUrl, formData, {
       headers,
     });
 
-    if (!response.ok) {
-      throw new Error(
-        `Failed to partition file ${this.filePath} with error ${response.status} and message ${await response.text()}`,
-      );
-    }
+    // if (!response.) {
+    //   throw new Error(
+    //     `Failed to partition file ${this.filePath} with error ${response.status} and message ${await response.text()}`,
+    //   );
+    // }
 
-    const elements = await response.json();
+    const elements = response.data;
     if (!Array.isArray(elements)) {
       throw new Error(`Expected partitioning request to return an array, but got ${elements}`);
     }

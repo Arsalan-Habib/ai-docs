@@ -10,7 +10,7 @@ import Dialog from "@mui/material/Dialog";
 import { randomBytes } from "crypto";
 import { useParams, useRouter } from "next/navigation";
 import PDFMerger from "pdf-merger-js/browser";
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { Dispatch, FormEvent, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import styles from "./AddDocumentsDialog.module.css";
 import { UploadStages } from "@/types";
@@ -18,6 +18,7 @@ import InfoIcon from "@/icons/InfoIcon";
 import CheckIcon from "@/icons/CheckIcon";
 import { pdfjs } from "react-pdf";
 import { client } from "@/utils";
+import { Alert, Snackbar } from "@mui/material";
 
 async function uploadFile(url: string, data: ArrayBuffer) {
   try {
@@ -69,7 +70,15 @@ const ProgressIndicator = ({
   }
 };
 
-const AddDocumentsDialog = ({ open, handleClose }: { open: boolean; handleClose: () => void }) => {
+const AddDocumentsDialog = ({
+  open,
+  handleClose,
+  setIsError,
+}: {
+  open: boolean;
+  handleClose: () => void;
+  setIsError: Dispatch<SetStateAction<boolean>>;
+}) => {
   const [filesSrc, setFilesSrc] = useState<File[]>([]);
   const params = useParams();
   const [loading, setLoading] = useState(false);
@@ -167,6 +176,9 @@ const AddDocumentsDialog = ({ open, handleClose }: { open: boolean; handleClose:
       router.refresh();
     } catch (error) {
       console.log("error", error);
+
+      setIsError(true);
+      handleClose();
     }
   }
 
